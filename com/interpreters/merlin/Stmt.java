@@ -9,6 +9,7 @@ public abstract class Stmt {
 	public interface Visitor<R> {
 		R visitExpressionStmt(ExpressionStmt stmt);
 		R visitPrintStmt(PrintStmt stmt);
+		R visitBlockStmt(BlockStmt stmt);
 		R visitVarDeclStmt(VarDeclStmt stmt);
 	}
 
@@ -37,6 +38,20 @@ public abstract class Stmt {
 			return visitor.visitPrintStmt(this);
 		}
 		public final Expr expression;
+	}
+
+
+
+	public static class BlockStmt extends Stmt{
+		public BlockStmt(List<Stmt> statements) {
+			this.statements = statements;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitBlockStmt(this);
+		}
+		public final List<Stmt> statements;
 	}
 
 

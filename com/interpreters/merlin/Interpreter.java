@@ -7,6 +7,7 @@ import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
+import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.PrintStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
@@ -167,6 +168,23 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             environment.define(stmt.names.get(i), value);
         }
         return null;
+    }
+
+    @Override
+    public Void visitBlockStmt(BlockStmt stmt) {
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }
+
+    public void executeBlock(List<Stmt> statements, Environment blockEnvironment) {
+        Environment tmp = this.environment;
+        this.environment = blockEnvironment;
+        try {
+            interprete(statements);
+        }
+        finally {
+            this.environment = tmp;
+        }
     }
     
 }

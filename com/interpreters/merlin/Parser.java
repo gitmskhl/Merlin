@@ -39,8 +39,22 @@ public class Parser {
 
     private Stmt statement() {
         if (match(PRINT)) return printStatement();
+        if (match(LEFT_BRACE)) return blockStatement();
 
         return expressionStatement();
+    }
+
+    private Stmt blockStatement() {
+        return new Stmt.BlockStmt(block("block"));
+    }
+
+    private List<Stmt> block(String where) {
+        List<Stmt> statements = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            statements.add(declaration());
+        }
+        consume(RIGHT_BRACE, "Expect '}' after " + where + ".");
+        return statements;
     }
 
     private Stmt varDeclarationStatement() {
@@ -162,6 +176,10 @@ public class Parser {
         }
 
         return false;
+    }
+
+    private boolean check(TokenType type) {
+        return peek().type == type;
     }
 
     private Token advance() {

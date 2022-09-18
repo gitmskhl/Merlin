@@ -35,6 +35,8 @@ public class Generate {
         defineAST(outputDir, "Stmt",  Arrays.asList(
             "Expression : Expr expression",
             "Print      : Expr expression",
+            "Block      : List<Stmt> statements",
+
             "VarDecl    : List<Token> names, List<Expr> initializers"
         ));
     }
