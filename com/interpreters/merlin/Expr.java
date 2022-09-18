@@ -13,6 +13,7 @@ public abstract class Expr {
 		R visitBinaryExpr(BinaryExpr expr);
 		R visitVariableExpr(VariableExpr expr);
 		R visitAssignExpr(AssignExpr expr);
+		R visitLogicExpr(LogicExpr expr);
 	}
 
 
@@ -104,6 +105,24 @@ public abstract class Expr {
 		}
 		public final Expr.VariableExpr object;
 		public final  Expr value;
+	}
+
+
+
+	public static class LogicExpr extends Expr{
+		public LogicExpr(Expr left, Token operation, Expr right) {
+			this.left = left;
+			this.operation = operation;
+			this.right = right;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitLogicExpr(this);
+		}
+		public final Expr left;
+		public final  Token operation;
+		public final  Expr right;
 	}
 
 

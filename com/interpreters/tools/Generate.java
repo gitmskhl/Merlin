@@ -30,13 +30,15 @@ public class Generate {
             "Grouping   : Expr expression",
             "Binary     : Expr left, Token operation, Expr right",
             "Variable   : Token name",
-            "Assign     : Expr.VariableExpr object, Expr value"
+            "Assign     : Expr.VariableExpr object, Expr value",
+            "Logic      : Expr left, Token operation, Expr right"
         ));
         
         defineAST(outputDir, "Stmt",  Arrays.asList(
             "Expression : Expr expression",
             "Print      : Expr expression",
             "Block      : List<Stmt> statements",
+            "IF         : Expr condition, Stmt thenBranch, Stmt elseBranch",
 
             "VarDecl    : List<Token> names, List<Expr> initializers"
         ));

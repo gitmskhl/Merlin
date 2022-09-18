@@ -6,10 +6,12 @@ import com.interpreters.merlin.Expr.AssignExpr;
 import com.interpreters.merlin.Expr.BinaryExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
+import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
 import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
+import com.interpreters.merlin.Stmt.IFStmt;
 import com.interpreters.merlin.Stmt.PrintStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
 
@@ -22,14 +24,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public void interprete(List<Stmt> statements) {
         try {
             for (Stmt statement : statements) 
-                interprete(statement);
+                execute(statement);
         }
         catch(RuntimeError error) {
             Merlin.runtimeError(error.token, error.message);
         }
     }
 
-    public void interprete(Stmt stmt) {
+    public void execute(Stmt stmt) {
         stmt.accept(this);
     }
 
@@ -93,6 +95,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             case BANG_EQUAL: return !equals(left, right);
         }
         return null;
+    }
+
+    @Override
+    public Object visitLogicExpr(LogicExpr expr) {
+        Object left = evaluate(expr.left);
+        if (expr.operation.type == TokenType.OR) {
+            if (isTruthy(left)) return left;
+        }
+        else {
+            if (!isTruthy(left)) return left;
+        }
+        return evaluate(expr.right);
     }
 
     @Override
@@ -193,5 +207,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         finally {
             this.environment = tmp;
         }
+    }
+
+    @Override
+    public Void visitIFStmt(IFStmt stmt) {
+        Object condition = evaluate(stmt.condition);
+        if (isTruthy(condition)) execute(stmt.thenBranch);
+        else if (stmt.elseBranch != null) execute(stmt.elseBranch);
+        
+        return null;
     }
 }
