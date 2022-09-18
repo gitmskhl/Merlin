@@ -29,7 +29,8 @@ public class Generate {
             "Unary      : Token operation, Expr right",
             "Grouping   : Expr expression",
             "Binary     : Expr left, Token operation, Expr right",
-            "Variable   : Token name"
+            "Variable   : Token name",
+            "Assign     : Expr.VariableExpr object, Expr value"
         ));
         
         defineAST(outputDir, "Stmt",  Arrays.asList(

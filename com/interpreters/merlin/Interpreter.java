@@ -2,6 +2,7 @@ package com.interpreters.merlin;
 
 import java.util.List;
 
+import com.interpreters.merlin.Expr.AssignExpr;
 import com.interpreters.merlin.Expr.BinaryExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
@@ -99,6 +100,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return environment.get(expr.name);
     }
 
+    @Override
+    public Object visitAssignExpr(AssignExpr expr) {
+        Object value = evaluate(expr.value);
+        environment.assign(expr.object.name, value);
+        return value;
+    }
+
     private Object evaluate(Expr expr) {
         return expr.accept(this);
     }
@@ -186,5 +194,4 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             this.environment = tmp;
         }
     }
-    
 }

@@ -89,7 +89,20 @@ public class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return assignment();
+    }
+
+    private Expr assignment() {
+        Expr expr = equality();
+        if (match(EQUAL)) {
+            if (expr instanceof Expr.VariableExpr) {
+                Expr value = assignment();
+                return new Expr.AssignExpr((Expr.VariableExpr) expr, value);
+            }
+            throw error("Can't assign a non-variable type value.");
+        }
+
+        return expr;
     }
 
     private Expr equality() {
