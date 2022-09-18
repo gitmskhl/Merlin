@@ -14,6 +14,7 @@ import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.IFStmt;
 import com.interpreters.merlin.Stmt.PrintStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
+import com.interpreters.merlin.Stmt.WHILEStmt;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -215,6 +216,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if (isTruthy(condition)) execute(stmt.thenBranch);
         else if (stmt.elseBranch != null) execute(stmt.elseBranch);
         
+        return null;
+    }
+
+    @Override
+    public Void visitWHILEStmt(WHILEStmt stmt) {
+        while (isTruthy(evaluate(stmt.condition))) execute(stmt.body);
         return null;
     }
 }

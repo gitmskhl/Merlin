@@ -11,6 +11,7 @@ public abstract class Stmt {
 		R visitPrintStmt(PrintStmt stmt);
 		R visitBlockStmt(BlockStmt stmt);
 		R visitIFStmt(IFStmt stmt);
+		R visitWHILEStmt(WHILEStmt stmt);
 		R visitVarDeclStmt(VarDeclStmt stmt);
 	}
 
@@ -71,6 +72,22 @@ public abstract class Stmt {
 		public final Expr condition;
 		public final  Stmt thenBranch;
 		public final  Stmt elseBranch;
+	}
+
+
+
+	public static class WHILEStmt extends Stmt{
+		public WHILEStmt(Expr condition, Stmt body) {
+			this.condition = condition;
+			this.body = body;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitWHILEStmt(this);
+		}
+		public final Expr condition;
+		public final  Stmt body;
 	}
 
 
