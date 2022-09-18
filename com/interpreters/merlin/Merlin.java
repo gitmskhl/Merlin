@@ -8,9 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.interpreters.tools.Printer;
+
 public class Merlin {
     
     private static boolean hadError = false;
+    private static boolean hadRuntimeError = false;
 
 
     public static void main(String[] args) throws IOException {
@@ -43,7 +46,24 @@ public class Merlin {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
-        for (Token token : tokens) System.out.println(token);
+        Parser parser = new Parser(tokens);
+        Expr expr = parser.parse();
+        
+        if (hadError) return;
+
+        //System.out.println(new Printer().print(expr));
+    
+        Interpreter interpreter = new Interpreter();
+        interpreter.interprete(expr);
+    }
+
+    public static void runtimeError(Token token, String message) {
+        hadRuntimeError = true;
+        report(token.line, token.position, token.lexeme, message);
+    }
+
+    public static void error(Token token, String message) {
+        error(token.line, token.position, token.lexeme, message);
     }
 
     public static void  error(int line, int position, String lexeme, String message) {
@@ -53,7 +73,7 @@ public class Merlin {
 
     private static void report(int line, int position, String lexeme, String message) {
         System.err.println(
-            "[line " + line + ", position " + position + ", at '" + lexeme + "'']: " + message);
+            "[line " + line + ", position " + position + ", at '" + lexeme + "']: " + message);
     }
 
     

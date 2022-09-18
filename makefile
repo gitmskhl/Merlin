@@ -16,3 +16,8 @@ file: clean compile
 
 a:
 	java com.interpreters.merlin.Merlin a.merlin
+
+generate:
+	rm com/interpreters/tools/Generate.class -f
+	javac com/interpreters/tools/Generate.java
+	java com.interpreters.tools.Generate com/interpreters/merlin

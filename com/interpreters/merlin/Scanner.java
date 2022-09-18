@@ -50,7 +50,7 @@ public class Scanner {
             scanToken();
         }
 
-        tokens.add(new Token(EOF, "", null, line, position + 1));
+        tokens.add(new Token(EOF, "at the end of the file", null, line, position + 1));
 
         return tokens;
     }
