@@ -70,12 +70,32 @@ public class Interpreter implements Expr.Visitor<Object> {
                     return (double) left - (double) right;
                 }
                 throw new RuntimeError(expr.operation, "Operands must be two numbers.");
+
+            case LESS: return less(left, right, expr.operation);
+            case LESS_EQUAL: return !less(right, left, expr.operation);
+            case GREATER_EQUAL: return !less(left, right, expr.operation);
+            case GREATER: return less(right, left, expr.operation);
+            case EQUAL_EQUAL: return equals(left, right);
+            case BANG_EQUAL: return !equals(left, right);
         }
         return null;
     }
 
     private Object evaluate(Expr expr) {
         return expr.accept(this);
+    }
+
+    private boolean equals(Object left, Object right) {
+        if (left == null) return false;
+        return left.equals(right);
+    }
+
+    private boolean less(Object left, Object right, Token operation) {
+        if ((left instanceof Double) && (right instanceof Double)) return (double) left < (double) right;
+        if ((left instanceof String) && (right instanceof Double)) 
+            return ((String) left).compareTo((String) right) < 0;
+        
+        throw new RuntimeError(operation, "Operands must be two numbers or two strings.");
     }
 
     private String stringify(Object object) {
