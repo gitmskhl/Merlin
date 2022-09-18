@@ -1,11 +1,2 @@
 
-def makeCounter(start) {
-    return def () {
-        start = start + 1;
-        return start;
-    };
-}
-
-var counter = makeCounter(10);
-
-for (var i = 0; i < 10; i = i + 1) println(counter());
+a.f++;

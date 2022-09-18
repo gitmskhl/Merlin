@@ -33,7 +33,9 @@ public class Generate {
             "Assign     : Expr.VariableExpr object, Expr value",
             "Logic      : Expr left, Token operation, Expr right",
             "Call       : Expr callee, Token paren, List<Expr> arguments",
-            "Function   : Token paren, List<Token> parameters, List<Stmt> body"
+            "Function   : Token paren, List<Token> parameters, List<Stmt> body",
+            "Pre-Inc    : Expr.VariableExpr object, Token operation",
+            "Post-Inc   : Expr.VariableExpr object, Token operation"
         ));
         
         defineAST(outputDir, "Stmt",  Arrays.asList(

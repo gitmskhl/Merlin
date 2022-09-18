@@ -160,9 +160,13 @@ public class Parser {
 
     private Expr assignment() {
         Expr expr = or();
-        if (match(EQUAL)) {
+        if (match(EQUAL, PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL, PERCENT_EQUAL)) {
             if (expr instanceof Expr.VariableExpr) {
+                Token operator = previous();
                 Expr value = assignment();
+                
+                if (operator.type != EQUAL) value = replaceOperator(operator, expr, value);
+                
                 return new Expr.AssignExpr((Expr.VariableExpr) expr, value);
             }
             throw error("Can't assign a non-variable type value.");
@@ -315,6 +319,27 @@ public class Parser {
         }
         consume(RIGHT_PAREN, "Expect ')' after arguments.");
         return arguments;
+    }
+
+    private Expr replaceOperator(Token operator, Expr expr, Expr value) {
+        
+        TokenType type = null;
+
+        switch (operator.type) {
+            case PLUS_EQUAL: type = PLUS; break;
+            case MINUS_EQUAL: type = MINUS; break;
+            case STAR_EQUAL: type = STAR; break;
+            case SLASH_EQUAL: type = SLASH; break;
+            case PERCENT_EQUAL: type = PERCENT; break;
+        }
+        Token operation = new Token(
+                type, 
+                operator.lexeme, 
+                operator.literal, 
+                operator.line, 
+                operator.position);
+            
+        return new Expr.BinaryExpr(expr, operation, value);
     }
 
     private boolean checkNext(TokenType type) {

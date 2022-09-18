@@ -10,6 +10,7 @@ public enum TokenType {
 
     // two-character
     BANG_EQUAL, EQUAL_EQUAL, LESS_EQUAL, GREATER_EQUAL, 
+    PLUS_EQUAL, MINUS_EQUAL, SLASH_EQUAL, STAR_EQUAL, PERCENT_EQUAL,
 
     // primary
     NUMBER, STRING, IDENTIFIER,

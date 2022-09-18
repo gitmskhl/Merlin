@@ -71,10 +71,10 @@ public class Scanner {
             case ')': addToken(RIGHT_PAREN); break;
             case '{': addToken(LEFT_BRACE); break;
             case '}': addToken(RIGHT_BRACE); break;
-            case '+': addToken(PLUS); break;
-            case '-': addToken(MINUS); break;
-            case '*': addToken(STAR); break;
-            case '%': addToken(PERCENT); break;
+            case '+': addToken(match('=') ? PLUS_EQUAL : PLUS); break;
+            case '-': addToken(match('=') ? MINUS_EQUAL : MINUS); break;
+            case '*': addToken(match('=') ? STAR_EQUAL : STAR); break;
+            case '%': addToken(match('=') ? PERCENT_EQUAL : PERCENT); break;
             case ';': addToken(SEMICOLON); break;
             case '?': addToken(QUESTION); break;
             case ':': addToken(COLON); break;
@@ -86,7 +86,7 @@ public class Scanner {
             
             case '/':
                 if (match('/')) comment();
-                else addToken(SLASH);
+                else addToken(match('=') ? SLASH_EQUAL : SLASH);
                 break;
             case '<': addToken((match('=') ? LESS_EQUAL : LESS)); break;
             case '>': addToken((match('=') ? GREATER_EQUAL : GREATER)); break;
