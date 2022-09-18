@@ -1,2 +1,6 @@
+var i = 0;
 
-a.f++;
+for (;i < 10;) {
+    println("hi");
+    i = i + 1;
+}

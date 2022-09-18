@@ -270,9 +270,31 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitFORStmt(FORStmt stmt) {
 
-        for (execute(stmt.initializer); isTruthy(evaluate(stmt.condition)); evaluate(stmt.increment)) {
-            execute(stmt.body);
+        if (stmt.initializer != null) {
+            if (stmt.increment != null) {
+                for (execute(stmt.initializer); isTruthy(evaluate(stmt.condition)); evaluate(stmt.increment)) {
+                    execute(stmt.body);
+                }
+            }
+            else {
+                for (execute(stmt.initializer); isTruthy(evaluate(stmt.condition));) {
+                    execute(stmt.body);
+                }
+            }
         }
+        else {
+            if (stmt.increment != null) {
+                for (;isTruthy(evaluate(stmt.condition)); evaluate(stmt.increment)) {
+                    execute(stmt.body);
+                }
+            }
+            else {
+                for (;isTruthy(evaluate(stmt.condition));) {
+                    execute(stmt.body);
+                }
+            }
+        }
+        
 
         return null;
     }
