@@ -40,6 +40,7 @@ public class Generate {
             "Block      : List<Stmt> statements",
             "IF         : Expr condition, Stmt thenBranch, Stmt elseBranch",
             "WHILE      : Expr condition, Stmt body",
+            "FOR        : Stmt initializer, Expr condition, Expr increment, Stmt body",
 
             "VarDecl    : List<Token> names, List<Expr> initializers"
         ));

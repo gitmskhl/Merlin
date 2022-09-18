@@ -1,6 +1,7 @@
 package com.interpreters.merlin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.interpreters.merlin.TokenType.*;
@@ -42,8 +43,37 @@ public class Parser {
         if (match(LEFT_BRACE)) return blockStatement();
         if (match(IF)) return ifStatement();
         if (match(WHILE)) return whileStatement();
+        if (match(FOR)) return forStatement();
 
         return expressionStatement();
+    }
+
+    private Stmt forStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+        Stmt initializer = null;
+        if (!match(SEMICOLON)) {
+            if (match(VAR)) {
+                initializer = varDeclarationStatement();
+            }
+            else initializer = expressionStatement();
+        }
+
+        Expr condition = new Expr.LiteralExpr(true);
+        if (!check(SEMICOLON)) {
+            condition = expression();
+        }
+        consume(SEMICOLON, "Expect ';' after condition.");
+
+        Expr increment = null;
+        if (!check(RIGHT_PAREN)) {
+            increment = expression();
+        }
+        consume(RIGHT_PAREN, "Expect ')' after clauses.");
+
+        Stmt body = statement();
+        Stmt forStmt =  new Stmt.FORStmt(initializer, condition, increment, body);
+        return new Stmt.BlockStmt(Arrays.asList(forStmt));
     }
 
     private Stmt whileStatement() {

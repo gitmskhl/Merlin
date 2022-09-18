@@ -12,6 +12,7 @@ public abstract class Stmt {
 		R visitBlockStmt(BlockStmt stmt);
 		R visitIFStmt(IFStmt stmt);
 		R visitWHILEStmt(WHILEStmt stmt);
+		R visitFORStmt(FORStmt stmt);
 		R visitVarDeclStmt(VarDeclStmt stmt);
 	}
 
@@ -87,6 +88,26 @@ public abstract class Stmt {
 			return visitor.visitWHILEStmt(this);
 		}
 		public final Expr condition;
+		public final  Stmt body;
+	}
+
+
+
+	public static class FORStmt extends Stmt{
+		public FORStmt(Stmt initializer, Expr condition, Expr increment, Stmt body) {
+			this.initializer = initializer;
+			this.condition = condition;
+			this.increment = increment;
+			this.body = body;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitFORStmt(this);
+		}
+		public final Stmt initializer;
+		public final  Expr condition;
+		public final  Expr increment;
 		public final  Stmt body;
 	}
 

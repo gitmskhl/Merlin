@@ -11,6 +11,7 @@ import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
 import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
+import com.interpreters.merlin.Stmt.FORStmt;
 import com.interpreters.merlin.Stmt.IFStmt;
 import com.interpreters.merlin.Stmt.PrintStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
@@ -222,6 +223,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitWHILEStmt(WHILEStmt stmt) {
         while (isTruthy(evaluate(stmt.condition))) execute(stmt.body);
+        return null;
+    }
+
+    @Override
+    public Void visitFORStmt(FORStmt stmt) {
+
+        for (execute(stmt.initializer); isTruthy(evaluate(stmt.condition)); evaluate(stmt.increment)) {
+            execute(stmt.body);
+        }
+
         return null;
     }
 }
