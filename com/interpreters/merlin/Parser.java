@@ -36,6 +36,10 @@ public class Parser {
 
     private Stmt declaration() {
         if (match(VAR)) return varDeclarationStatement();
+        if (check(DEF) && checkNext(IDENTIFIER)) {
+            advance();
+            return funDeclarationStatement("function");
+        }
 
         return statement();
     }
@@ -45,8 +49,17 @@ public class Parser {
         if (match(IF)) return ifStatement();
         if (match(WHILE)) return whileStatement();
         if (match(FOR)) return forStatement();
+        if (match(RETURN)) return returnStatement();
 
         return expressionStatement();
+    }
+
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+        if (!check(SEMICOLON)) value = expression();
+        consume(SEMICOLON, "Expect ';' after return statement.");
+        return new Stmt.RETURNStmt(keyword, value);
     }
 
     private Stmt forStatement() {
@@ -127,6 +140,12 @@ public class Parser {
         consume(SEMICOLON, "Expect ';' after variable declaration.");
 
         return new Stmt.VarDeclStmt(names, initializers);
+    }
+
+    private Stmt funDeclarationStatement(String type) {
+        Token name = consume(IDENTIFIER, "Expect " + type + " name.");
+        Expr.FunctionExpr description = parseAnonymusFunction();
+        return new Stmt.FunDeclStmt(name, description);
     }
 
     private Stmt expressionStatement() {
@@ -255,6 +274,7 @@ public class Parser {
         if (match(FALSE)) return new Expr.LiteralExpr(false);
         if (match(STRING, NUMBER)) return new Expr.LiteralExpr(previous().literal);
         if (match(IDENTIFIER)) return new Expr.VariableExpr(previous());
+        if (match(DEF)) return parseAnonymusFunction();
 
         if (match(LEFT_PAREN)) {
             Expr expr = expression();
@@ -263,6 +283,23 @@ public class Parser {
         }
 
         throw error("Unexpected expression.");
+    }
+
+
+    private Expr.FunctionExpr parseAnonymusFunction() {
+        Token paren = consume(LEFT_PAREN, "Expect '(' before parameters.");
+        List<Token> parameters = new ArrayList<>();
+        while (!check(RIGHT_PAREN) && !isAtEnd()) {
+            parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+        }
+        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+        consume(LEFT_BRACE, "Expect '{' before body.");
+        List<Stmt> body = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            body.add(declaration());
+        }
+        consume(RIGHT_BRACE, "Expect '}' after body.");
+        return new Expr.FunctionExpr(paren, parameters, body);
     }
 
     private List<Expr> parseArguments() {
@@ -278,6 +315,14 @@ public class Parser {
         }
         consume(RIGHT_PAREN, "Expect ')' after arguments.");
         return arguments;
+    }
+
+    private boolean checkNext(TokenType type) {
+        if (isAtEnd()) return false;
+        ++current;
+        boolean result = check(type);
+        --current;
+        return result;
     }
 
     private Token consume(TokenType type, String message) {

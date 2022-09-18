@@ -12,7 +12,9 @@ public abstract class Stmt {
 		R visitIFStmt(IFStmt stmt);
 		R visitWHILEStmt(WHILEStmt stmt);
 		R visitFORStmt(FORStmt stmt);
+		R visitRETURNStmt(RETURNStmt stmt);
 		R visitVarDeclStmt(VarDeclStmt stmt);
+		R visitFunDeclStmt(FunDeclStmt stmt);
 	}
 
 
@@ -98,6 +100,22 @@ public abstract class Stmt {
 
 
 
+	public static class RETURNStmt extends Stmt{
+		public RETURNStmt(Token keyword, Expr value) {
+			this.keyword = keyword;
+			this.value = value;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitRETURNStmt(this);
+		}
+		public final Token keyword;
+		public final  Expr value;
+	}
+
+
+
 	public static class VarDeclStmt extends Stmt{
 		public VarDeclStmt(List<Token> names, List<Expr> initializers) {
 			this.names = names;
@@ -110,6 +128,22 @@ public abstract class Stmt {
 		}
 		public final List<Token> names;
 		public final  List<Expr> initializers;
+	}
+
+
+
+	public static class FunDeclStmt extends Stmt{
+		public FunDeclStmt(Token name, Expr.FunctionExpr description) {
+			this.name = name;
+			this.description = description;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitFunDeclStmt(this);
+		}
+		public final Token name;
+		public final  Expr.FunctionExpr description;
 	}
 
 

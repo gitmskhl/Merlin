@@ -32,7 +32,8 @@ public class Generate {
             "Variable   : Token name",
             "Assign     : Expr.VariableExpr object, Expr value",
             "Logic      : Expr left, Token operation, Expr right",
-            "Call       : Expr callee, Token paren, List<Expr> arguments"
+            "Call       : Expr callee, Token paren, List<Expr> arguments",
+            "Function   : Token paren, List<Token> parameters, List<Stmt> body"
         ));
         
         defineAST(outputDir, "Stmt",  Arrays.asList(
@@ -41,8 +42,10 @@ public class Generate {
             "IF         : Expr condition, Stmt thenBranch, Stmt elseBranch",
             "WHILE      : Expr condition, Stmt body",
             "FOR        : Stmt initializer, Expr condition, Expr increment, Stmt body",
+            "RETURN     : Token keyword, Expr value",
 
-            "VarDecl    : List<Token> names, List<Expr> initializers"
+            "VarDecl    : List<Token> names, List<Expr> initializers",
+            "FunDecl    : Token name, Expr.FunctionExpr description"
         ));
     }
 

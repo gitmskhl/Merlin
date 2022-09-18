@@ -6,6 +6,7 @@ import java.util.List;
 import com.interpreters.merlin.Expr.AssignExpr;
 import com.interpreters.merlin.Expr.BinaryExpr;
 import com.interpreters.merlin.Expr.CallExpr;
+import com.interpreters.merlin.Expr.FunctionExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
@@ -14,7 +15,9 @@ import com.interpreters.merlin.Expr.VariableExpr;
 import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
+import com.interpreters.merlin.Stmt.FunDeclStmt;
 import com.interpreters.merlin.Stmt.IFStmt;
+import com.interpreters.merlin.Stmt.RETURNStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
 import com.interpreters.merlin.Stmt.WHILEStmt;
 import com.interpreters.merlin.nativeFunctions.Printf;
@@ -162,6 +165,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return callee.call(this, arguments);
     }
 
+    @Override
+    public Object visitFunctionExpr(FunctionExpr expr) {
+        return new MerlinFunction(null, expr, environment);
+    }
+
     private Object evaluate(Expr expr) {
         return expr.accept(this);
     }
@@ -267,5 +275,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         return null;
+    }
+
+    @Override
+    public Void visitFunDeclStmt(FunDeclStmt stmt) {
+        MerlinFunction function = new MerlinFunction(stmt.name.lexeme, stmt.description, environment);
+        environment.define(stmt.name, function);
+        return null;
+    }
+
+    @Override
+    public Void visitRETURNStmt(RETURNStmt stmt) {
+        Object value = null;
+        if (stmt.value != null) value = evaluate(stmt.value);
+        throw new Return(value);
     }
 }
