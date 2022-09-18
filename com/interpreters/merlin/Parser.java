@@ -12,6 +12,8 @@ public class Parser {
     private final List<Token> tokens;
     private int current = 0;
 
+    private final int max_arguments = 255;
+
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
@@ -39,7 +41,6 @@ public class Parser {
     }
 
     private Stmt statement() {
-        if (match(PRINT)) return printStatement();
         if (match(LEFT_BRACE)) return blockStatement();
         if (match(IF)) return ifStatement();
         if (match(WHILE)) return whileStatement();
@@ -128,12 +129,6 @@ public class Parser {
         return new Stmt.VarDeclStmt(names, initializers);
     }
 
-    private Stmt printStatement() {
-        Expr expr = expression();
-        consume(SEMICOLON, "Expect ';' after expression.");
-        return new Stmt.PrintStmt(expr);
-    }
-
     private Stmt expressionStatement() {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
@@ -213,8 +208,19 @@ public class Parser {
     }
 
     private Expr factor() {
-        Expr expr = unary();
+        Expr expr = mod();
         while (match(STAR, SLASH)) {
+            Token operation = previous();
+            Expr right = mod();
+            expr = new Expr.BinaryExpr(expr, operation, right);
+        }
+
+        return expr;
+    }
+
+    private Expr mod() {
+        Expr expr = unary();
+        while (match(PERCENT)) {
             Token operation = previous();
             Expr right = unary();
             expr = new Expr.BinaryExpr(expr, operation, right);
@@ -229,7 +235,18 @@ public class Parser {
             Expr right = unary();
             return new Expr.UnaryExpr(operation, right);
         }
-        return primary();
+        return call();
+    }
+
+    private Expr call() {
+        Expr expr = primary();
+        while(match(LEFT_PAREN)) {
+            Token paren = previous();
+            List<Expr> arguments = parseArguments();
+            expr = new Expr.CallExpr(expr, paren, arguments);
+        }
+
+        return expr;
     }
 
     private Expr primary() {
@@ -246,6 +263,21 @@ public class Parser {
         }
 
         throw error("Unexpected expression.");
+    }
+
+    private List<Expr> parseArguments() {
+        List<Expr> arguments = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (arguments.size() > max_arguments) {
+                    throw new RuntimeError(peek(), 
+                        "The maximum number of arguments must not exceed 255");
+                }
+                arguments.add(expression());
+            } while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expect ')' after arguments.");
+        return arguments;
     }
 
     private Token consume(TokenType type, String message) {

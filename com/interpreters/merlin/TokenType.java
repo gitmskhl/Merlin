@@ -3,7 +3,7 @@ package com.interpreters.merlin;
 
 public enum TokenType {
     // single character
-    BANG, MINUS, PLUS, STAR, SLASH,
+    BANG, MINUS, PLUS, STAR, SLASH, PERCENT,
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
     COMMA, DOT, SEMICOLON, LESS, GREATER, EQUAL, LEFT_BRACKET, RIGHT_BRACKET,
     COLON, QUESTION,
@@ -16,7 +16,7 @@ public enum TokenType {
 
     // keywords
     TRUE, FALSE, NIL, FOR, WHILE, IF, ELSE, DEF, CLASS, AND, OR,
-    RETURN, THIS, SUPER, VAR, PRINT,
+    RETURN, THIS, SUPER, VAR,
 
     /// END OF FILE
     EOF

@@ -1,9 +1,11 @@
 package com.interpreters.merlin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.interpreters.merlin.Expr.AssignExpr;
 import com.interpreters.merlin.Expr.BinaryExpr;
+import com.interpreters.merlin.Expr.CallExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
@@ -13,15 +15,20 @@ import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
 import com.interpreters.merlin.Stmt.IFStmt;
-import com.interpreters.merlin.Stmt.PrintStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
 import com.interpreters.merlin.Stmt.WHILEStmt;
+import com.interpreters.merlin.nativeFunctions.Printf;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private final Environment global = new Environment(null);
     private Environment environment = global;
 
+
+    Interpreter() {
+        global.define("print", new Printf(""));
+        global.define("println", new Printf("\n"));
+    }
 
     public void interprete(List<Stmt> statements) {
         try {
@@ -89,6 +96,15 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 }
                 throw new RuntimeError(expr.operation, "Operands must be two numbers.");
 
+            case PERCENT:
+                if ((left instanceof Double) && (right instanceof Double)) {
+                    if ((double) right == 0) 
+                        throw new RuntimeError(expr.operation, "Divison by zero.");
+                    
+                    return Math.floor((double)left) % Math.floor((double)right);
+                }
+                throw new RuntimeError(expr.operation, "Operands must be two numbers.");
+
             case LESS: return less(left, right, expr.operation);
             case LESS_EQUAL: return !less(right, left, expr.operation);
             case GREATER_EQUAL: return !less(left, right, expr.operation);
@@ -123,6 +139,29 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return value;
     }
 
+    @Override
+    public Object visitCallExpr(CallExpr expr) {
+        Object object = evaluate(expr.callee);
+        if (!(object instanceof MerlinCallable)) {
+            throw new RuntimeError(expr.paren, 
+                "The call operator can only be used on function and class objects");
+        }
+
+        MerlinCallable callee = (MerlinCallable) object;
+
+        if (callee.arity() != -1) {
+            if (callee.arity() != expr.arguments.size()) {
+                throw new RuntimeError(expr.paren, 
+                    "Expected " + callee.arity() + " arguments but got" + expr.arguments.size() + ".");
+            }
+        }
+        
+        List<Object> arguments = new ArrayList<>();
+        for (Expr arg : expr.arguments) arguments.add(evaluate(arg));
+
+        return callee.call(this, arguments);
+    }
+
     private Object evaluate(Expr expr) {
         return expr.accept(this);
     }
@@ -140,7 +179,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         throw new RuntimeError(operation, "Operands must be two numbers or two strings.");
     }
 
-    private String stringify(Object object) {
+    public static String stringify(Object object) {
         if (object == null) return "nil";
 
         if (object instanceof Double) {
@@ -176,12 +215,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitExpressionStmt(ExpressionStmt stmt) {
         evaluate(stmt.expression);
-        return null;
-    }
-
-    @Override
-    public Void visitPrintStmt(PrintStmt stmt) {
-        System.out.println(stringify(evaluate(stmt.expression)));
         return null;
     }
 

@@ -31,12 +31,12 @@ public class Generate {
             "Binary     : Expr left, Token operation, Expr right",
             "Variable   : Token name",
             "Assign     : Expr.VariableExpr object, Expr value",
-            "Logic      : Expr left, Token operation, Expr right"
+            "Logic      : Expr left, Token operation, Expr right",
+            "Call       : Expr callee, Token paren, List<Expr> arguments"
         ));
         
         defineAST(outputDir, "Stmt",  Arrays.asList(
             "Expression : Expr expression",
-            "Print      : Expr expression",
             "Block      : List<Stmt> statements",
             "IF         : Expr condition, Stmt thenBranch, Stmt elseBranch",
             "WHILE      : Expr condition, Stmt body",

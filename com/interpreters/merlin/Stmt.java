@@ -8,7 +8,6 @@ public abstract class Stmt {
 
 	public interface Visitor<R> {
 		R visitExpressionStmt(ExpressionStmt stmt);
-		R visitPrintStmt(PrintStmt stmt);
 		R visitBlockStmt(BlockStmt stmt);
 		R visitIFStmt(IFStmt stmt);
 		R visitWHILEStmt(WHILEStmt stmt);
@@ -25,20 +24,6 @@ public abstract class Stmt {
 		@Override
 		public <R> R accept(Visitor<R> visitor) {
 			return visitor.visitExpressionStmt(this);
-		}
-		public final Expr expression;
-	}
-
-
-
-	public static class PrintStmt extends Stmt{
-		public PrintStmt(Expr expression) {
-			this.expression = expression;
-		}
-
-		@Override
-		public <R> R accept(Visitor<R> visitor) {
-			return visitor.visitPrintStmt(this);
 		}
 		public final Expr expression;
 	}

@@ -28,7 +28,6 @@ public class Scanner {
         keywords.put("if",     IF);
         keywords.put("nil",    NIL);
         keywords.put("or",     OR);
-        keywords.put("print",  PRINT);
         keywords.put("return", RETURN);
         keywords.put("super",  SUPER);
         keywords.put("this",   THIS);
@@ -75,6 +74,7 @@ public class Scanner {
             case '+': addToken(PLUS); break;
             case '-': addToken(MINUS); break;
             case '*': addToken(STAR); break;
+            case '%': addToken(PERCENT); break;
             case ';': addToken(SEMICOLON); break;
             case '?': addToken(QUESTION); break;
             case ':': addToken(COLON); break;
