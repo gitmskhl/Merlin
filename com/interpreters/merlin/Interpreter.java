@@ -1,22 +1,34 @@
 package com.interpreters.merlin;
 
+import java.util.List;
+
 import com.interpreters.merlin.Expr.BinaryExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
+import com.interpreters.merlin.Expr.VariableExpr;
+import com.interpreters.merlin.Stmt.ExpressionStmt;
+import com.interpreters.merlin.Stmt.PrintStmt;
+import com.interpreters.merlin.Stmt.VarDeclStmt;
 
-public class Interpreter implements Expr.Visitor<Object> {
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
-    public Object interprete(Expr expr) {
+    private final Environment global = new Environment(null);
+    private Environment environment = global;
+
+
+    public void interprete(List<Stmt> statements) {
         try {
-            Object result = evaluate(expr);
-            System.out.println(stringify(result));
-            return result;
+            for (Stmt statement : statements) 
+                interprete(statement);
         }
-        catch (RuntimeError error) {
+        catch(RuntimeError error) {
             Merlin.runtimeError(error.token, error.message);
-            return null;
         }
+    }
+
+    public void interprete(Stmt stmt) {
+        stmt.accept(this);
     }
 
     @Override
@@ -81,6 +93,11 @@ public class Interpreter implements Expr.Visitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visitVariableExpr(VariableExpr expr) {
+        return environment.get(expr.name);
+    }
+
     private Object evaluate(Expr expr) {
         return expr.accept(this);
     }
@@ -129,6 +146,27 @@ public class Interpreter implements Expr.Visitor<Object> {
             return stringify(left) + (String) right;
         }
         throw new RuntimeError(operation, "TypeError: Operands must be numbers or strings.");
+    }
+
+    @Override
+    public Void visitExpressionStmt(ExpressionStmt stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(PrintStmt stmt) {
+        System.out.println(stringify(evaluate(stmt.expression)));
+        return null;
+    }
+
+    @Override
+    public Void visitVarDeclStmt(VarDeclStmt stmt) {
+        for (int i = 0, end = stmt.names.size(); i < end; ++i) {
+            Object value = evaluate(stmt.initializers.get(i));
+            environment.define(stmt.names.get(i), value);
+        }
+        return null;
     }
     
 }

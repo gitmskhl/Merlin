@@ -1,5 +1,6 @@
 package com.interpreters.merlin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.interpreters.merlin.TokenType.*;
@@ -14,14 +15,63 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    public Expr parse() {
-        try {
-            return expression();
+    public List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!isAtEnd()) {
+            try {
+                statements.add(declaration());
+            }
+            catch (ParseError error) {
+                // synchronize
+                return null;
+            }
         }
-        catch (ParseError error) {
-            // synchronize
-            return null;
-        }
+        
+        return statements;
+    }
+
+    private Stmt declaration() {
+        if (match(VAR)) return varDeclarationStatement();
+
+        return statement();
+    }
+
+    private Stmt statement() {
+        if (match(PRINT)) return printStatement();
+
+        return expressionStatement();
+    }
+
+    private Stmt varDeclarationStatement() {
+        List<Token> names = new ArrayList<>();
+        List<Expr> initializers = new ArrayList<>();
+
+        do {
+            Token name = consume(IDENTIFIER, "Expect a variable name.");
+            Expr initializer = null;
+            if (match(EQUAL)) {
+                initializer = expression();
+            }
+            names.add(name);
+            initializers.add(initializer);
+        } while(match(COMMA));
+
+        consume(SEMICOLON, "Expect ';' after variable declaration.");
+
+        return new Stmt.VarDeclStmt(names, initializers);
+    }
+
+    private Stmt printStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.PrintStmt(expr);
+    }
+
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.ExpressionStmt(expr);
     }
 
     private Expr expression() {
@@ -86,6 +136,7 @@ public class Parser {
         if (match(TRUE)) return new Expr.LiteralExpr(true);
         if (match(FALSE)) return new Expr.LiteralExpr(false);
         if (match(STRING, NUMBER)) return new Expr.LiteralExpr(previous().literal);
+        if (match(IDENTIFIER)) return new Expr.VariableExpr(previous());
 
         if (match(LEFT_PAREN)) {
             Expr expr = expression();

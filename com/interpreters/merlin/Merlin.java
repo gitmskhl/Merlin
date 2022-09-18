@@ -47,14 +47,14 @@ public class Merlin {
         List<Token> tokens = scanner.scanTokens();
 
         Parser parser = new Parser(tokens);
-        Expr expr = parser.parse();
+        List<Stmt> statements = parser.parse();
         
         if (hadError) return;
 
         //System.out.println(new Printer().print(expr));
     
         Interpreter interpreter = new Interpreter();
-        interpreter.interprete(expr);
+        interpreter.interprete(statements);
     }
 
     public static void runtimeError(Token token, String message) {

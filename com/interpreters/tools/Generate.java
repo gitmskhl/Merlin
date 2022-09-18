@@ -28,10 +28,15 @@ public class Generate {
             "Literal    : Object value",
             "Unary      : Token operation, Expr right",
             "Grouping   : Expr expression",
-            "Binary     : Expr left, Token operation, Expr right"
+            "Binary     : Expr left, Token operation, Expr right",
+            "Variable   : Token name"
         ));
         
-        
+        defineAST(outputDir, "Stmt",  Arrays.asList(
+            "Expression : Expr expression",
+            "Print      : Expr expression",
+            "VarDecl    : List<Token> names, List<Expr> initializers"
+        ));
     }
 
     private static void defineAST(String outputDir, String baseName, List<String> types) throws IOException {
