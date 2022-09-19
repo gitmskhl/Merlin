@@ -374,12 +374,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         environment.define(stmt.name.lexeme, null);
 
         Map<String, MerlinFunction> methods = new HashMap<>();
+        MerlinFunction constructor = null;
         for (Stmt.FunDeclStmt function : stmt.methods) {
             MerlinFunction method = new MerlinFunction(function.name.lexeme, function.description, environment);
-            methods.put(function.name.lexeme, method);
+            if (function.name.lexeme.equals("init")) constructor = method;
+            else methods.put(function.name.lexeme, method);
         }
 
-        MerlinClass mc = new MerlinClass(stmt.name.lexeme, superclass, methods);
+        MerlinClass mc = new MerlinClass(stmt.name.lexeme, superclass, methods, constructor);
         environment.assign(stmt.name.lexeme, mc);
 
         return null;

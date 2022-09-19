@@ -8,23 +8,28 @@ public class MerlinClass implements MerlinCallable {
     private final String name;
     private final MerlinClass superclass;
     private final Map<String, MerlinFunction> methods;
+    private final MerlinFunction constructor;
+    private final int _arity;
     
 
-    public MerlinClass(String name, MerlinClass superclass, Map<String, MerlinFunction> methods) {
+    public MerlinClass(String name, MerlinClass superclass, Map<String, MerlinFunction> methods, MerlinFunction constructor) {
         this.name = name;
         this.superclass = superclass;
         this.methods = methods;
+        this.constructor = constructor;
+        this._arity = constructor != null ? constructor.arity() : 0;
     }
 
     @Override
     public int arity() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this._arity;
     }
 
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
-        return new MerlinInstance(this);
+        MerlinInstance instance =  new MerlinInstance(this);
+        if (constructor != null) constructor.bind("this", instance).call(interpreter, arguments);
+        return instance;
     }
 
     public MerlinFunction findMethod(Token name) {

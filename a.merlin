@@ -1,40 +1,12 @@
+class A{
 
-class Human {
-  getName() {
-    return this.name;
+  init() {
+
   }
 
-  getAge() {
-    return this.age;
-  }
-
-  setName(name) {
-    this.name = name;
-  }
-
-  setAge(age) {
-    this.age = age;
+  hello(message) {
+    println(message);
   }
 }
 
-class Person : Human {
-  init(name, age) {
-    this.name = name;
-    this.age = age;
-    return this;
-  }
-}
-
-var Musa = Person().init("Musa", 23),
-    Albina = Person().init("Albina", 27);
-
-println(Musa.getName() + " " + Musa.getAge());
-println(Albina.getName() + " " + Albina.getAge());
-
-Musa.setName("Misha");
-Musa.setAge(17);
-Albina.setName("Albinos");
-Albina.setAge(19);
-
-println(Musa.getName() + " " + Musa.getAge());
-println(Albina.getName() + " " + Albina.getAge());
+println(A().hello("Hello, world"));
