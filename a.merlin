@@ -1,6 +1,10 @@
 
-def f(a, b, c) {
-    return a + b;
-}
+class B {}
 
-println("Hello, world");
+class A : B {
+
+  say() {
+
+  }
+
+}

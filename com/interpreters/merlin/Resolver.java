@@ -17,6 +17,7 @@ import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
 import com.interpreters.merlin.Stmt.BlockStmt;
+import com.interpreters.merlin.Stmt.ClassDeclStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
 import com.interpreters.merlin.Stmt.FunDeclStmt;
@@ -302,6 +303,17 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
             Merlin.warning(token, "Variable is not used.");
         }
         scopes.pop();
+    }
+
+    @Override
+    public Void visitClassDeclStmt(ClassDeclStmt stmt) {
+        declare(stmt.name);
+        define(stmt.name.lexeme);
+        scopes.peek().initialize(stmt.name.lexeme);
+        if (stmt.superclass != null) resolve(stmt.superclass);
+        /// поднастройка будет здесь
+        for (Stmt.FunDeclStmt method : stmt.methods) resolve(method);
+        return null;
     }
     
 }

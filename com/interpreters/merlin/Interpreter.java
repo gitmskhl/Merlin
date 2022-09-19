@@ -1,6 +1,7 @@
 package com.interpreters.merlin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
 import com.interpreters.merlin.Stmt.BlockStmt;
+import com.interpreters.merlin.Stmt.ClassDeclStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
 import com.interpreters.merlin.Stmt.FunDeclStmt;
@@ -325,5 +327,28 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object value = null;
         if (stmt.value != null) value = evaluate(stmt.value);
         throw new Return(value);
+    }
+
+    @Override
+    public Void visitClassDeclStmt(ClassDeclStmt stmt) {
+        MerlinClass superclass = null;
+        if (stmt.superclass != null) {
+            Object object = evaluate(stmt.superclass);
+            if (object instanceof MerlinClass) superclass = (MerlinClass) object;
+            else throw new RuntimeError(stmt.superclass.name, "Superclass must be class.");
+        }
+
+        environment.define(stmt.name.lexeme, null);
+
+        Map<String, MerlinFunction> methods = new HashMap<>();
+        for (Stmt.FunDeclStmt function : stmt.methods) {
+            MerlinFunction method = new MerlinFunction(function.name.lexeme, function.description, environment);
+            methods.put(function.name.lexeme, method);
+        }
+
+        MerlinClass mc = new MerlinClass(stmt.name.lexeme, superclass, methods);
+        environment.assign(stmt.name.lexeme, mc);
+
+        return null;
     }
 }

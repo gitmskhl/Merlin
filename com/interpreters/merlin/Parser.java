@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.interpreters.merlin.Stmt.FunDeclStmt;
+
 import static com.interpreters.merlin.TokenType.*;
 
 public class Parser {
@@ -36,6 +38,7 @@ public class Parser {
 
     private Stmt declaration() {
         if (match(VAR)) return varDeclarationStatement();
+        if (match(CLASS)) return classDeclarationStatement();
         if (check(DEF) && checkNext(IDENTIFIER)) {
             advance();
             return funDeclarationStatement("function");
@@ -52,6 +55,21 @@ public class Parser {
         if (match(RETURN)) return returnStatement();
 
         return expressionStatement();
+    }
+
+    private Stmt classDeclarationStatement() {
+        Token name = consume(IDENTIFIER, "Expect class name.");
+        Expr.VariableExpr superclass = null;
+        if (match(COLON)) {
+            superclass = new Expr.VariableExpr(consume(IDENTIFIER, "Expect superclass name."));
+        }
+        consume(LEFT_BRACE, "Expect '{' before class body.");
+        List<FunDeclStmt> methods = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            methods.add(funDeclarationStatement("method"));
+        }
+        consume(RIGHT_BRACE, "Expect '}' after class body.");
+        return new Stmt.ClassDeclStmt(name, superclass, methods);
     }
 
     private Stmt returnStatement() {
@@ -142,7 +160,7 @@ public class Parser {
         return new Stmt.VarDeclStmt(names, initializers);
     }
 
-    private Stmt funDeclarationStatement(String type) {
+    private Stmt.FunDeclStmt funDeclarationStatement(String type) {
         Token name = consume(IDENTIFIER, "Expect " + type + " name.");
         Expr.FunctionExpr description = parseAnonymusFunction();
         return new Stmt.FunDeclStmt(name, description);

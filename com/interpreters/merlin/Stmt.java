@@ -15,6 +15,7 @@ public abstract class Stmt {
 		R visitRETURNStmt(RETURNStmt stmt);
 		R visitVarDeclStmt(VarDeclStmt stmt);
 		R visitFunDeclStmt(FunDeclStmt stmt);
+		R visitClassDeclStmt(ClassDeclStmt stmt);
 	}
 
 
@@ -144,6 +145,24 @@ public abstract class Stmt {
 		}
 		public final Token name;
 		public final  Expr.FunctionExpr description;
+	}
+
+
+
+	public static class ClassDeclStmt extends Stmt{
+		public ClassDeclStmt(Token name, Expr.VariableExpr superclass, List<FunDeclStmt> methods) {
+			this.name = name;
+			this.superclass = superclass;
+			this.methods = methods;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitClassDeclStmt(this);
+		}
+		public final Token name;
+		public final  Expr.VariableExpr superclass;
+		public final  List<FunDeclStmt> methods;
 	}
 
 

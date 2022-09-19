@@ -45,7 +45,8 @@ public class Generate {
             "RETURN     : Token keyword, Expr value",
 
             "VarDecl    : List<Token> names, List<Expr> initializers",
-            "FunDecl    : Token name, Expr.FunctionExpr description"
+            "FunDecl    : Token name, Expr.FunctionExpr description",
+            "ClassDecl  : Token name, Expr.VariableExpr superclass, List<FunDeclStmt> methods"
         ));
     }
 
