@@ -1,4 +1,41 @@
 
+// 3.1415926
 
+class A {
+    f() {
+        this.pi = 3;
+    }
+}
 
-println(def () {});
+class B : A{
+    f() {
+        super.f();
+        this.pi += 0.1;
+    }
+}
+
+class C : B {
+    f() {
+        super.f();
+        this.pi += 0.04;
+    }
+}
+
+class D : C {
+    f() {
+        super.f();
+        this.pi += 0.001;
+    }
+}
+
+class E : D {
+    f() {
+        super.f();
+        this.pi += 0.0005;
+    }
+}
+
+var a = E();
+a.f();
+
+println(a.pi);
