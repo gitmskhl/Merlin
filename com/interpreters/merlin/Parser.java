@@ -316,6 +316,12 @@ public class Parser {
         if (match(IDENTIFIER)) return new Expr.VariableExpr(previous());
         if (match(DEF)) return parseAnonymusFunction();
         if (match(THIS)) return new Expr.ThisExpr(previous());
+        if (match(SUPER)) {
+            Token keyword = previous();
+            consume(DOT, "Expect '.' after 'super'.");
+            Token property = consume(IDENTIFIER, "Expect property.");
+            return new Expr.SuperExpr(keyword, property);
+        }
 
         if (match(LEFT_PAREN)) {
             Expr expr = expression();
