@@ -95,11 +95,17 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         FUNCTION
     }
 
+    enum ClassType {
+        NONE,
+        CLASS
+    }
+
     /// List -> [defined, used, initialized]
     private final Stack<Scope> scopes = new Stack<>();
     private final Map<Expr, Integer> distances = new HashMap<>();
 
     private FunctionType currentFunction = FunctionType.NONE;
+    private ClassType currentClass = ClassType.NONE;
 
 
 
@@ -289,6 +295,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitThisExpr(ThisExpr expr) {
+        if (currentClass != ClassType.CLASS) {
+            Merlin.error(expr.keyword, "Can't use 'this' outside of a class.");
+        }
+
         resolveLocal(expr.keyword, expr, false);
         return null;
     }
@@ -346,7 +356,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
         beginScope();
         scopes.peek().defineNative("this");
+        ClassType tmp = currentClass;
+        currentClass = ClassType.CLASS;
         for (Stmt.FunDeclStmt method : stmt.methods) resolve(method);
+        currentClass = tmp;
         endScope();
         if (stmt.superclass != null) {
             endScope();
