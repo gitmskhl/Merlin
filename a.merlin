@@ -1,41 +1,29 @@
 
-// 3.1415926
-
 class A {
-    f() {
-        this.pi = 3;
+    sqr(n) {
+        return n * n;
     }
 }
 
-class B : A{
-    f() {
-        super.f();
-        this.pi += 0.1;
+class B : A {
+    cube(n) {
+        return super.sqr(n) * n;
     }
 }
 
 class C : B {
-    f() {
-        super.f();
-        this.pi += 0.04;
+    fourth(n) {
+        return this.cube(n) * n;
+    }
+
+    fourth2(n) {
+        return this.sqr(this.sqr(n));
     }
 }
 
-class D : C {
-    f() {
-        super.f();
-        this.pi += 0.001;
-    }
+var c = C();
+
+for (var i = 1; i < 5; i += 1) {
+    println(i + " " + c.sqr(i) + " " + c.cube(i) + " " + c.fourth(i) + " " + c.fourth2(i));
 }
 
-class E : D {
-    f() {
-        super.f();
-        this.pi += 0.0005;
-    }
-}
-
-var a = E();
-a.f();
-
-println(a.pi);

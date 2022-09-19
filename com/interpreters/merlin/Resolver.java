@@ -95,11 +95,20 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         FUNCTION
     }
 
+    enum ClassType {
+        NONE,
+        CLASS,
+        SUBCLASS
+    }
+
+    private boolean isConstructor = false;
+
     /// List -> [defined, used, initialized]
     private final Stack<Scope> scopes = new Stack<>();
     private final Map<Expr, Integer> distances = new HashMap<>();
 
     private FunctionType currentFunction = FunctionType.NONE;
+    private ClassType currentClass = ClassType.NONE;
 
 
 
@@ -196,6 +205,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         if (currentFunction == FunctionType.NONE) {
             Merlin.error(stmt.keyword, "Can't return from top-level code.");
         }
+        if (isConstructor && stmt.value != null) {
+            Merlin.error(stmt.keyword, "Can't return a value in the constructor.");
+        }
         if (stmt.value != null) resolve(stmt.value);
         return null;
     }
@@ -289,12 +301,22 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitThisExpr(ThisExpr expr) {
+        if (currentClass == ClassType.NONE) {
+            Merlin.error(expr.keyword, "Can't use 'this' outside of a class.");
+        }
+
         resolveLocal(expr.keyword, expr, false);
         return null;
     }
 
     @Override
     public Void visitSuperExpr(SuperExpr expr) {
+        if (currentClass == ClassType.NONE) {
+            Merlin.error(expr.keyword, "Can't use 'super' outside of a class.");
+        }
+        else if (currentClass != ClassType.SUBCLASS) {
+            Merlin.error(expr.keyword, "Can't use 'super' in a class with no superclass.");
+        }
         resolveLocal(expr.keyword, expr, false);
         return null;
     }
@@ -346,7 +368,15 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
         beginScope();
         scopes.peek().defineNative("this");
-        for (Stmt.FunDeclStmt method : stmt.methods) resolve(method);
+        ClassType tmp = currentClass;
+        currentClass = stmt.superclass != null ? ClassType.SUBCLASS : ClassType.CLASS;
+        boolean previous = isConstructor;
+        for (Stmt.FunDeclStmt method : stmt.methods) {
+            isConstructor = method.name.lexeme.equals("init");
+            resolve(method);
+        }
+        isConstructor = previous;
+        currentClass = tmp;
         endScope();
         if (stmt.superclass != null) {
             endScope();
