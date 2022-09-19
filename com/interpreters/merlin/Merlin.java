@@ -29,7 +29,7 @@ public class Merlin {
 
     private static void runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-        run(new String(bytes, Charset.defaultCharset()));
+        run(Merlin.interpreter, new String(bytes, Charset.defaultCharset()), path);
     }
 
     private static void runPrompt() throws IOException {
@@ -40,12 +40,12 @@ public class Merlin {
             System.out.print("> ");
             String line = reader.readLine();
             if (line == null) break;
-            run(line);
+            run(Merlin.interpreter, line, "prompt");
         }
     }
 
-    private static void run(String source) {
-        Scanner scanner = new Scanner(source);
+    private static void run(Interpreter interpreter, String source, String fileName) {
+        Scanner scanner = new Scanner(source, fileName);
         List<Token> tokens = scanner.scanTokens();
 
         Parser parser = new Parser(tokens);
@@ -65,26 +65,28 @@ public class Merlin {
 
     public static void runtimeError(Token token, String message) {
         hadRuntimeError = true;
-        report(token.line, token.position, token.lexeme, message);
+        System.err.println("Runtime Error: ");
+        report(token.line, token.position, token.lexeme, message, token.file);
     }
 
     public static void error(Token token, String message) {
-        error(token.line, token.position, token.lexeme, message);
+        error(token.line, token.position, token.lexeme, message, token.file);
     }
 
-    public static void  error(int line, int position, String lexeme, String message) {
+    public static void  error(int line, int position, String lexeme, String message, String file) {
+        System.err.println("Error: ");
         hadError = true;
-        report(line, position, lexeme, message);
+        report(line, position, lexeme, message, file);
     }
 
-    private static void report(int line, int position, String lexeme, String message) {
-        System.err.println(
-            "[line " + line + ", position " + position + ", at '" + lexeme + "']: " + message);
+    private static void report(int line, int position, String lexeme, String message, String file) {
+        System.err.println("In file: " + file +
+            "\n[line " + line + ", position " + position + ", at '" + lexeme + "']: " + message);
     }
 
     public static void warning(Token token, String message) {
         System.out.print("Warning: ");
-        report(token.line, token.position, token.lexeme, message);
+        report(token.line, token.position, token.lexeme, message, token.file);
     }
     
 

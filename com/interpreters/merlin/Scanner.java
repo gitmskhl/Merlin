@@ -10,6 +10,7 @@ import static com.interpreters.merlin.TokenType.*;
 public class Scanner {
     private static final Map<String, TokenType> keywords = new HashMap<>();
 
+    private final String file;
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
     private int start = 0;
@@ -37,8 +38,9 @@ public class Scanner {
     }
 
 
-    Scanner(String source) {
+    Scanner(String source, String file) {
         this.source = source;
+        this.file = file;
     }
 
 
@@ -49,7 +51,7 @@ public class Scanner {
             scanToken();
         }
 
-        tokens.add(new Token(EOF, "at the end of the file", null, line, position + 1));
+        tokens.add(new Token(EOF, "at the end of the file", null, line, position + 1, file));
 
         return tokens;
     }
@@ -107,7 +109,7 @@ public class Scanner {
         String lexeme = source.substring(start, current);
         TokenType type = keywords.get(lexeme);
         if (type == null) type = IDENTIFIER;
-        tokens.add(new Token(type, lexeme, null, line, position));
+        tokens.add(new Token(type, lexeme, null, line, position, file));
     }
 
     private void number(char previous) {
@@ -119,7 +121,7 @@ public class Scanner {
 
         String lexeme = source.substring(start, current);
         Double literal = Double.parseDouble(lexeme);
-        tokens.add(new Token(NUMBER, lexeme, literal, line, position));
+        tokens.add(new Token(NUMBER, lexeme, literal, line, position, file));
     }
 
     private boolean isDigit(char c) {
@@ -148,7 +150,7 @@ public class Scanner {
         else {
             advance();
             String lexeme = source.substring(start + 1, current - 1);
-            Token token = new Token(STRING, lexeme, lexeme, line, position);
+            Token token = new Token(STRING, lexeme, lexeme, line, position, file);
             tokens.add(token);
         }
     }
@@ -193,7 +195,7 @@ public class Scanner {
     }
 
     private void addToken(TokenType type) {
-        tokens.add(new Token(type, source.substring(start, current), null, line, position));
+        tokens.add(new Token(type, source.substring(start, current), null, line, position, file));
     }
 
     private void error(String lexeme, String message) {

@@ -31,15 +31,27 @@ import com.interpreters.merlin.nativeFunctions.Printf;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
+    private final boolean mainThread;
+    private final Map<String, MerlinLib> libs;
+
     private final Environment global = new Environment(null);
     private Environment environment = global;
 
     private Map<Expr, Integer> distances;
 
-
-    Interpreter() {
+    Interpreter(Map<String, MerlinLib> libs, boolean mainThread) {
+        this.libs = libs;
+        this.mainThread = mainThread;
         global.define("print", new Printf(""));
         global.define("println", new Printf("\n"));
+    }
+
+    Interpreter() {
+        this(new HashMap<>(), true);
+    }
+
+    public boolean isMain() {
+        return this.mainThread;
     }
 
     public void setDistance(Map<Expr, Integer> distances) {

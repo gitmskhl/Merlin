@@ -382,7 +382,8 @@ public class Parser {
                 operator.lexeme, 
                 operator.literal, 
                 operator.line, 
-                operator.position);
+                operator.position,
+                operator.file);
             
         return new Expr.BinaryExpr(expr, operation, value);
     }
