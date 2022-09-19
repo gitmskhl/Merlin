@@ -12,6 +12,8 @@ import com.interpreters.tools.Printer;
 
 public class Merlin {
     
+    private static Interpreter interpreter = new Interpreter();
+
     private static boolean hadError = false;
     private static boolean hadRuntimeError = false;
 
@@ -51,9 +53,13 @@ public class Merlin {
         
         if (hadError) return;
 
+        Resolver resolver = new Resolver();
+        interpreter.setDistance(resolver.resolveStatements(statements));
+
+        if (hadError) return;
+
         //System.out.println(new Printer().print(expr));
     
-        Interpreter interpreter = new Interpreter();
         interpreter.interprete(statements);
     }
 
@@ -76,6 +82,10 @@ public class Merlin {
             "[line " + line + ", position " + position + ", at '" + lexeme + "']: " + message);
     }
 
+    public static void warning(Token token, String message) {
+        System.out.print("Warning: ");
+        report(token.line, token.position, token.lexeme, message);
+    }
     
 
 }

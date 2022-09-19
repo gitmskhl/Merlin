@@ -11,36 +11,29 @@ public class Environment {
         this.enclosing = enclosing;
     }
 
-    public void define(Token name, Object value) {
-        if (!values.containsKey(name.lexeme)) {
-            values.put(name.lexeme, value);
-            return;
-        }
-
-        throw new RuntimeError(name, "Redefinition of variable.");
-    }
-
     public void define(String name, Object value) {
         values.put(name, value);
     }
 
-    public Object get(Token name) {
-        if (values.containsKey(name.lexeme)) return values.get(name.lexeme);
-
-        if (enclosing != null) return enclosing.get(name);
-
-        throw new RuntimeError(name, "Undefined variable.");
+    public Object get(String name) {
+        return values.get(name);
     }
 
-    public void assign(Token name, Object value) {
-        if (values.containsKey(name.lexeme)) {
-            values.put(name.lexeme, value);
-            return;
-        }
-        if (enclosing != null) {
-            enclosing.assign(name, value);
-            return;
-        }
-        throw new RuntimeError(name, "Undefined variable.");
+    public Object get(String name, int depth) {
+        return ancestor(depth).get(name);
+    }
+
+    public void assign(String name, Object value) {
+        values.put(name, value);
+    }
+
+    public void assign(String name, Object value, int depth) {
+        ancestor(depth).assign(name, value);
+    }
+
+    private Environment ancestor(int depth) {
+        Environment current = this;
+        for (int i = 0; i < depth; ++i) current = current.enclosing;
+        return current;
     }
 }

@@ -25,7 +25,7 @@ public class MerlinFunction implements MerlinCallable {
     public Object call(Interpreter interpreter, List<Object> arguments) {
         Environment environment = new Environment(closure);
         for (int i = 0; i < arguments.size(); ++i) {
-            environment.define(description.parameters.get(i), arguments.get(i));
+            environment.define(description.parameters.get(i).lexeme, arguments.get(i));
         }
 
         try {

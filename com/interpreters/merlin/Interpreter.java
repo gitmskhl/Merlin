@@ -2,6 +2,7 @@ package com.interpreters.merlin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.interpreters.merlin.Expr.AssignExpr;
 import com.interpreters.merlin.Expr.BinaryExpr;
@@ -27,10 +28,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     private final Environment global = new Environment(null);
     private Environment environment = global;
 
+    private Map<Expr, Integer> distances;
+
 
     Interpreter() {
         global.define("print", new Printf(""));
         global.define("println", new Printf("\n"));
+    }
+
+    public void setDistance(Map<Expr, Integer> distances) {
+        this.distances = distances;
     }
 
     public void interprete(List<Stmt> statements) {
@@ -132,13 +139,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitVariableExpr(VariableExpr expr) {
-        return environment.get(expr.name);
+        if (distances.containsKey(expr)) {
+            return environment.get(expr.name.lexeme, distances.get(expr));
+        }
+        return global.get(expr.name.lexeme);
     }
 
     @Override
     public Object visitAssignExpr(AssignExpr expr) {
         Object value = evaluate(expr.value);
-        environment.assign(expr.object.name, value);
+        if (distances.containsKey(expr.object)) {
+            environment.assign(expr.object.name.lexeme, value, distances.get(expr.object));
+        } else global.assign(expr.object.name.lexeme, value);
         return value;
     }
 
@@ -229,8 +241,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitVarDeclStmt(VarDeclStmt stmt) {
         for (int i = 0, end = stmt.names.size(); i < end; ++i) {
-            Object value = evaluate(stmt.initializers.get(i));
-            environment.define(stmt.names.get(i), value);
+            Object value = null;
+            if (stmt.initializers.get(i) != null)
+                value = evaluate(stmt.initializers.get(i));
+            environment.define(stmt.names.get(i).lexeme, value);
         }
         return null;
     }
@@ -302,7 +316,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitFunDeclStmt(FunDeclStmt stmt) {
         MerlinFunction function = new MerlinFunction(stmt.name.lexeme, stmt.description, environment);
-        environment.define(stmt.name, function);
+        environment.define(stmt.name.lexeme, function);
         return null;
     }
 
