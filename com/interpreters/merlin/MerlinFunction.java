@@ -30,7 +30,7 @@ public class MerlinFunction implements MerlinCallable {
 
         try {
             interpreter.executeBlock(description.body, environment);
-            return false;
+            return null;
         }
         catch(Return ret) {
             return ret.value;

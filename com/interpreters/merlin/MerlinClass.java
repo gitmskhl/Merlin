@@ -24,13 +24,23 @@ public class MerlinClass implements MerlinCallable {
 
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
-        // TODO Auto-generated method stub
+        return new MerlinInstance(this);
+    }
+
+    public MerlinFunction findMethod(Token name) {
+        if (methods.containsKey(name.lexeme)) return methods.get(name.lexeme);
+        if (superclass != null) return superclass.findMethod(name);
+
         return null;
     }
 
     @Override
     public String toString() {
         return "<class '" + name + "'>";
+    }
+
+    public String getName() {
+        return name;
     }
     
 }

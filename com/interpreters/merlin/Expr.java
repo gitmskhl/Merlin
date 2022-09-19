@@ -16,6 +16,8 @@ public abstract class Expr {
 		R visitLogicExpr(LogicExpr expr);
 		R visitCallExpr(CallExpr expr);
 		R visitFunctionExpr(FunctionExpr expr);
+		R visitGetExpr(GetExpr expr);
+		R visitSetExpr(SetExpr expr);
 	}
 
 
@@ -161,6 +163,40 @@ public abstract class Expr {
 		public final Token paren;
 		public final  List<Token> parameters;
 		public final  List<Stmt> body;
+	}
+
+
+
+	public static class GetExpr extends Expr{
+		public GetExpr(Expr object, Token property) {
+			this.object = object;
+			this.property = property;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitGetExpr(this);
+		}
+		public final Expr object;
+		public final  Token property;
+	}
+
+
+
+	public static class SetExpr extends Expr{
+		public SetExpr(Expr object, Token property, Expr value) {
+			this.object = object;
+			this.property = property;
+			this.value = value;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitSetExpr(this);
+		}
+		public final Expr object;
+		public final  Token property;
+		public final  Expr value;
 	}
 
 

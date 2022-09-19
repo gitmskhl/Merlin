@@ -1,10 +1,4 @@
 
-class B {}
+class A {}
 
-class A : B {
-
-  say() {
-
-  }
-
-}
+var a = A + 1;

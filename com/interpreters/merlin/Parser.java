@@ -187,6 +187,16 @@ public class Parser {
                 
                 return new Expr.AssignExpr((Expr.VariableExpr) expr, value);
             }
+            else if (expr instanceof Expr.GetExpr) {
+                Token operator = previous();
+                Expr value = assignment();
+
+                if (operator.type != EQUAL) value = replaceOperator(operator, expr, value);
+
+                Expr.GetExpr get = (Expr.GetExpr) expr;
+                return new Expr.SetExpr(get.object, get.property, value);
+            }
+
             throw error("Can't assign a non-variable type value.");
         }
 
@@ -281,10 +291,18 @@ public class Parser {
 
     private Expr call() {
         Expr expr = primary();
-        while(match(LEFT_PAREN)) {
-            Token paren = previous();
-            List<Expr> arguments = parseArguments();
-            expr = new Expr.CallExpr(expr, paren, arguments);
+
+        while (true) {
+            if(match(LEFT_PAREN)) {
+                Token paren = previous();
+                List<Expr> arguments = parseArguments();
+                expr = new Expr.CallExpr(expr, paren, arguments);
+            }
+            else if (match(DOT)) {
+                Token property = consume(IDENTIFIER, "Expect property.");
+                expr = new Expr.GetExpr(expr, property);
+            }
+            else break;
         }
 
         return expr;
