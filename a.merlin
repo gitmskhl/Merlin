@@ -1,12 +1,4 @@
-class A{
 
-  init() {
 
-  }
 
-  hello(message) {
-    println(message);
-  }
-}
-
-println(A().hello("Hello, world"));
+println(def () {});

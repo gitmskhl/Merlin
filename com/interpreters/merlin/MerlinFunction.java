@@ -43,5 +43,11 @@ public class MerlinFunction implements MerlinCallable {
         MerlinFunction function = new MerlinFunction(name, description, environment);
         return function;
     }
+
+    @Override
+    public String toString() {
+        if (name != null) return "<fn '" + name + "'>";
+        return "<anonymus fn>";
+    }
     
 }
