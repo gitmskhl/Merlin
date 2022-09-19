@@ -293,8 +293,10 @@ public class Parser {
     private Expr.FunctionExpr parseAnonymusFunction() {
         Token paren = consume(LEFT_PAREN, "Expect '(' before parameters.");
         List<Token> parameters = new ArrayList<>();
-        while (!check(RIGHT_PAREN) && !isAtEnd()) {
-            parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+        if (!check(RIGHT_PAREN)) {
+            do {
+                parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+            } while(match(COMMA));
         }
         consume(RIGHT_PAREN, "Expect ')' after parameters.");
         consume(LEFT_BRACE, "Expect '{' before body.");

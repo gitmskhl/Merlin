@@ -85,9 +85,18 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     }
 
+    enum FunctionType {
+        NONE,
+        FUNCTION
+    }
+
     /// List -> [defined, used, initialized]
     private final Stack<Scope> scopes = new Stack<>();
     private final Map<Expr, Integer> distances = new HashMap<>();
+
+    private FunctionType currentFunction = FunctionType.NONE;
+
+
 
     public Map<Expr, Integer> resolveStatements(List<Stmt> statements) {
         beginScope();
@@ -179,6 +188,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitRETURNStmt(RETURNStmt stmt) {
+        if (currentFunction == FunctionType.NONE) {
+            Merlin.error(stmt.keyword, "Can't return from top-level code.");
+        }
         if (stmt.value != null) resolve(stmt.value);
         return null;
     }
@@ -200,6 +212,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     @Override
     public Void visitFunDeclStmt(FunDeclStmt stmt) {
         declare(stmt.name);
+        scopes.peek().initialize(stmt.name.lexeme);
         resolve(stmt.description);
         define(stmt.name.lexeme);
         return null;
@@ -258,13 +271,17 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitFunctionExpr(FunctionExpr expr) {
+        FunctionType tmp = currentFunction;
+        currentFunction = FunctionType.FUNCTION;
         beginScope();
         for (Token parameter : expr.parameters) {
             declare(parameter);
             define(parameter.lexeme);
+            scopes.peek().initialize(parameter.lexeme);
         }
         resolve(expr.body);
         endScope();
+        currentFunction = tmp;
         return null;
     }
 
