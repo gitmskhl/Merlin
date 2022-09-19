@@ -315,6 +315,7 @@ public class Parser {
         if (match(STRING, NUMBER)) return new Expr.LiteralExpr(previous().literal);
         if (match(IDENTIFIER)) return new Expr.VariableExpr(previous());
         if (match(DEF)) return parseAnonymusFunction();
+        if (match(THIS)) return new Expr.ThisExpr(previous());
 
         if (match(LEFT_PAREN)) {
             Expr expr = expression();

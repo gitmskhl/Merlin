@@ -14,6 +14,7 @@ import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
+import com.interpreters.merlin.Expr.ThisExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
 import com.interpreters.merlin.Stmt.BlockStmt;
@@ -206,6 +207,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Object visitThisExpr(ThisExpr expr) {
+        int distance = distances.get(expr);
+        return environment.get("this", distance);
+    }
+
+    @Override
     public Object visitFunctionExpr(FunctionExpr expr) {
         return new MerlinFunction(null, expr, environment);
     }
@@ -377,6 +384,5 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         return null;
     }
-
     
 }

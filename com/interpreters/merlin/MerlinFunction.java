@@ -36,5 +36,12 @@ public class MerlinFunction implements MerlinCallable {
             return ret.value;
         }
     }
+
+    public MerlinFunction bind(String name, Object value) {
+        Environment environment = new Environment(closure);
+        environment.define(name, value);
+        MerlinFunction function = new MerlinFunction(name, description, environment);
+        return function;
+    }
     
 }

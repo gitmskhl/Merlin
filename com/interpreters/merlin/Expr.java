@@ -18,6 +18,7 @@ public abstract class Expr {
 		R visitFunctionExpr(FunctionExpr expr);
 		R visitGetExpr(GetExpr expr);
 		R visitSetExpr(SetExpr expr);
+		R visitThisExpr(ThisExpr expr);
 	}
 
 
@@ -197,6 +198,20 @@ public abstract class Expr {
 		public final Expr object;
 		public final  Token property;
 		public final  Expr value;
+	}
+
+
+
+	public static class ThisExpr extends Expr{
+		public ThisExpr(Token keyword) {
+			this.keyword = keyword;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitThisExpr(this);
+		}
+		public final Token keyword;
 	}
 
 

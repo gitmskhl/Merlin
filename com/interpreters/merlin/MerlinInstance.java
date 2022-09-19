@@ -16,7 +16,7 @@ public class MerlinInstance {
         if (properties.containsKey(property.lexeme)) return properties.get(property.lexeme);
 
         MerlinFunction method = description.findMethod(property);
-        if (method != null) return method;
+        if (method != null) return method.bind("this", this);
 
         throw new RuntimeError(property, "Undefined property '" + property.lexeme + "'.");
     }
