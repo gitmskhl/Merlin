@@ -16,6 +16,7 @@ import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
+import com.interpreters.merlin.Expr.SuperExpr;
 import com.interpreters.merlin.Expr.ThisExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
@@ -293,6 +294,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitSuperExpr(SuperExpr expr) {
+        resolveLocal(expr.keyword, expr, false);
+        return null;
+    }
+
+    @Override
     public Void visitFunctionExpr(FunctionExpr expr) {
         FunctionType tmp = currentFunction;
         currentFunction = FunctionType.FUNCTION;
@@ -332,12 +339,18 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         declare(stmt.name);
         define(stmt.name.lexeme);
         scopes.peek().initialize(stmt.name.lexeme);
-        if (stmt.superclass != null) resolve(stmt.superclass);
-        /// поднастройка будет здесь
+        if (stmt.superclass != null) {
+            resolve(stmt.superclass);
+            beginScope();
+            scopes.peek().defineNative("super");
+        }
         beginScope();
         scopes.peek().defineNative("this");
         for (Stmt.FunDeclStmt method : stmt.methods) resolve(method);
         endScope();
+        if (stmt.superclass != null) {
+            endScope();
+        }
         
         return null;
     }

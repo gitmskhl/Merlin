@@ -14,6 +14,7 @@ import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
+import com.interpreters.merlin.Expr.SuperExpr;
 import com.interpreters.merlin.Expr.ThisExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
@@ -213,6 +214,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Object visitSuperExpr(SuperExpr expr) {
+        int distance = distances.get(expr);
+        MerlinClass superclass = (MerlinClass) environment.get(expr.keyword.lexeme, distance);
+        MerlinInstance instance = (MerlinInstance) environment.get("this", distance - 1);
+        return superclass.findMethod(expr.property).bind("this", instance);
+    }
+
+    @Override
     public Object visitFunctionExpr(FunctionExpr expr) {
         return new MerlinFunction(null, expr, environment);
     }
@@ -373,10 +382,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         environment.define(stmt.name.lexeme, null);
 
+        Environment closure = environment;
+        if (superclass != null) {
+            closure = new Environment(environment);
+            closure.define("super", superclass);
+        }
         Map<String, MerlinFunction> methods = new HashMap<>();
         MerlinFunction constructor = null;
         for (Stmt.FunDeclStmt function : stmt.methods) {
-            MerlinFunction method = new MerlinFunction(function.name.lexeme, function.description, environment);
+            MerlinFunction method = 
+                    new MerlinFunction(function.name.lexeme, function.description, closure);
             if (function.name.lexeme.equals("init")) constructor = method;
             else methods.put(function.name.lexeme, method);
         }
@@ -385,6 +400,5 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         environment.assign(stmt.name.lexeme, mc);
 
         return null;
-    }
-    
+    }    
 }
