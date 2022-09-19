@@ -305,6 +305,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitSuperExpr(SuperExpr expr) {
+        if (currentClass != ClassType.CLASS) {
+            Merlin.error(expr.keyword, "Can't use 'super' outside of a class.");
+        }
         resolveLocal(expr.keyword, expr, false);
         return null;
     }

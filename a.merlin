@@ -36,8 +36,8 @@ class E : D {
 }
 
 def f() {
-    println("This is a 'f' function");
-    this.pi = 0.2;
+    println("Hello, world");
+    super.age;
 }
 
 var a = E();
