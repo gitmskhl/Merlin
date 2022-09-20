@@ -1,6 +1,7 @@
 package com.interpreters.merlin;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -8,9 +9,18 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import com.interpreters.tools.Printer;
+import com.interpreters.tools.ConsoleColor;
 
 public class Merlin {
+
+    public static final String ANSI_BLACK_BACKGROUND = "\u001B[40m";
+    public static final String ANSI_RED_BACKGROUND = "\u001B[41m";
+    public static final String ANSI_GREEN_BACKGROUND = "\u001B[42m";
+    public static final String ANSI_YELLOW_BACKGROUND = "\u001B[43m";
+    public static final String ANSI_BLUE_BACKGROUND = "\u001B[44m";
+    public static final String ANSI_PURPLE_BACKGROUND = "\u001B[45m";
+    public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
+    public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
     
     private static Interpreter interpreter;
 
@@ -62,7 +72,8 @@ public class Merlin {
             throw new RuntimeError();
         }
 
-        Resolver resolver = new Resolver();
+        boolean showWarnings = true; ///interpreter.isMain();
+        Resolver resolver = new Resolver(showWarnings);
         interpreter.setDistance(resolver.resolveStatements(statements));
 
         if (hadError) {
@@ -77,7 +88,7 @@ public class Merlin {
 
     public static void runtimeError(Token token, String message) {
         hadRuntimeError = true;
-        System.err.println("Runtime Error: ");
+        System.err.println(ConsoleColor.RED + "Runtime Error: ");
         report(token.line, token.position, token.lexeme, message, token.file);
     }
 
@@ -86,19 +97,19 @@ public class Merlin {
     }
 
     public static void  error(int line, int position, String lexeme, String message, String file) {
-        System.err.println("Error: ");
+        System.err.println(ConsoleColor.RED + "Error: ");
         hadError = true;
         report(line, position, lexeme, message, file);
     }
 
     private static void report(int line, int position, String lexeme, String message, String file) {
         System.err.println("In file: " + file +
-            "\n[line " + line + ", position " + position + ", at '" + lexeme + "']: " + message);
+            "\n[line " + line + ", position " + position + ", at '" + lexeme + "']: " + message + ConsoleColor.RESET);
         System.out.println("\n");
     }
 
     public static void warning(Token token, String message) {
-        System.out.print("Warning: ");
+        System.out.print(ConsoleColor.PURPLE + "Warning: ");
         report(token.line, token.position, token.lexeme, message, token.file);
     }
     

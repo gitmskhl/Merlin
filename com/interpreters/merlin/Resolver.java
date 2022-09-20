@@ -34,6 +34,16 @@ import com.interpreters.merlin.Stmt.WHILEStmt;
 
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
+    private final boolean showWarnings;
+
+    public Resolver(boolean showWarnings) {
+        this.showWarnings = showWarnings;
+    }
+
+    public Resolver() {
+        this(true);
+    }
+
     class Scope {
         class State {
             public boolean defined = false;
@@ -156,6 +166,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
                 }
 
                 if (!scopes.get(i).isInitialized(name.lexeme)) {
+                    if (!showWarnings) return;
                     Merlin.warning(name, "Using an uninitialized variable.");
                 }
                 return;
@@ -370,12 +381,17 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         scopes.peek().initialize(name);
     }
 
+    private void use(String name) {
+        scopes.peek().use(name);
+    }
+
     private void beginScope() {
         scopes.push(new Scope());
     }
 
     private void endScope() {
         for (Token token : scopes.peek().getUnused()) {
+            if (!showWarnings) return;
             Merlin.warning(token, "Variable is not used.");
         }
         scopes.pop();
@@ -399,6 +415,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         for (Stmt.FunDeclStmt method : stmt.methods) {
             isConstructor = method.name.lexeme.equals("init");
             resolve(method);
+            use(method.name.lexeme);
         }
         isConstructor = previous;
         currentClass = tmp;
