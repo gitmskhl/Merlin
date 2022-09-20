@@ -7,3 +7,10 @@ var Musa = b.Man("Musa", 23), Lena = b.Woman("Lena", 20);
 
 Musa.show();
 Lena.show();
+
+
+def f(a, b) {
+    println(a);
+}
+
+f(4, 2);
