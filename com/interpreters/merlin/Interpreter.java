@@ -15,6 +15,7 @@ import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
+import com.interpreters.merlin.Expr.SuperCallExpr;
 import com.interpreters.merlin.Expr.SuperExpr;
 import com.interpreters.merlin.Expr.ThisExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
@@ -203,7 +204,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if (callee.arity() != -1) {
             if (callee.arity() != expr.arguments.size()) {
                 throw new RuntimeError(expr.paren, 
-                    "Expected " + callee.arity() + " arguments but got" + expr.arguments.size() + ".");
+                    "Expected " + callee.arity() + " arguments but got " + expr.arguments.size() + ".");
             }
         }
         
@@ -254,6 +255,26 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         MerlinInstance instance = (MerlinInstance) environment.get("this", distance - 1);
         return superclass.findMethod(expr.property).bind("this", instance);
     }
+
+    @Override
+    public Object visitSuperCallExpr(SuperCallExpr expr) {
+        int distance = distances.get(expr);
+        MerlinClass superclass = (MerlinClass) environment.get(expr.keyword.lexeme, distance);
+        MerlinFunction constructor = superclass.getConstructor();
+        if (constructor == null) return null;
+        if (constructor.arity() != expr.arguments.size()) {
+            throw new RuntimeError(expr.keyword, 
+                "Expected " + constructor.arity() + " arguments but got " + expr.arguments.size()+ ".");
+        }
+
+        List<Object> arguments = new ArrayList<>();
+        for (Expr arg : expr.arguments) arguments.add(evaluate(arg));
+
+
+        MerlinInstance instance = (MerlinInstance) environment.get("this", distance - 1);
+        superclass.getConstructor().bind("this", instance).call(this, arguments);
+        return null;
+    } 
 
     @Override
     public Object visitFunctionExpr(FunctionExpr expr) {
@@ -462,5 +483,5 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         environment.define(lib.name, lib);
 
         return null;
-    }    
+    }   
 }

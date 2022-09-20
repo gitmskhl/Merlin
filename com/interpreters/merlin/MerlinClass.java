@@ -47,5 +47,9 @@ public class MerlinClass implements MerlinCallable {
     public String getName() {
         return name;
     }
+
+    public MerlinFunction getConstructor() {
+        return constructor;
+    }
     
 }

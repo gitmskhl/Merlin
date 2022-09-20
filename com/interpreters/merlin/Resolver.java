@@ -16,6 +16,7 @@ import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
+import com.interpreters.merlin.Expr.SuperCallExpr;
 import com.interpreters.merlin.Expr.SuperExpr;
 import com.interpreters.merlin.Expr.ThisExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
@@ -319,6 +320,25 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
             Merlin.error(expr.keyword, "Can't use 'super' in a class with no superclass.");
         }
         resolveLocal(expr.keyword, expr, false);
+        return null;
+    }
+
+    @Override
+    public Void visitSuperCallExpr(SuperCallExpr expr) {
+        if (currentClass == ClassType.NONE) {
+            Merlin.error(expr.keyword, "Can't use 'super' outside of a class.");
+        }
+        else if (currentClass != ClassType.SUBCLASS) {
+            Merlin.error(expr.keyword, "Can't use 'super' in a class with no superclass.");
+        }
+
+        if (!isConstructor) {
+            Merlin.error(expr.keyword, "can't call a superclass constructor 'super(args)' outside of a constructor.");
+        }
+
+        resolveLocal(expr.keyword, expr, false);
+        for (Expr arg : expr.arguments) resolve(arg);
+
         return null;
     }
 
