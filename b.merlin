@@ -1,7 +1,7 @@
 
 class Human {
     init(name, age, sex) {
-        this.name = name;
+        this.name = name
         this.age = age;
         this.sex = sex;
     }
