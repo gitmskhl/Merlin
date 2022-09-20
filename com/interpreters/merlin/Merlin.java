@@ -62,7 +62,8 @@ public class Merlin {
             throw new RuntimeError();
         }
 
-        Resolver resolver = new Resolver();
+        boolean showWarnings = true; ///interpreter.isMain();
+        Resolver resolver = new Resolver(showWarnings);
         interpreter.setDistance(resolver.resolveStatements(statements));
 
         if (hadError) {
