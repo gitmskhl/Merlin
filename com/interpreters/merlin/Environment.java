@@ -36,4 +36,8 @@ public class Environment {
         for (int i = 0; i < depth; ++i) current = current.enclosing;
         return current;
     }
+
+    public Map<String, Object> getValues() {
+        return this.values;
+    }
 }

@@ -26,6 +26,7 @@ import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
 import com.interpreters.merlin.Stmt.FunDeclStmt;
 import com.interpreters.merlin.Stmt.IFStmt;
+import com.interpreters.merlin.Stmt.ImportStmt;
 import com.interpreters.merlin.Stmt.RETURNStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
 import com.interpreters.merlin.Stmt.WHILEStmt;
@@ -217,7 +218,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         for (int i = 0; i < stmt.names.size(); ++i) {
             declare(stmt.names.get(i));
             if (stmt.initializers.get(i) != null) {
-                scopes.peek().initialize(stmt.names.get(i).lexeme);
+                initialize(stmt.names.get(i).lexeme);
                 resolve(stmt.initializers.get(i));
             }
             define(stmt.names.get(i).lexeme);
@@ -229,7 +230,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     @Override
     public Void visitFunDeclStmt(FunDeclStmt stmt) {
         declare(stmt.name);
-        scopes.peek().initialize(stmt.name.lexeme);
+        initialize(stmt.name.lexeme);
         resolve(stmt.description);
         define(stmt.name.lexeme);
         return null;
@@ -329,7 +330,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         for (Token parameter : expr.parameters) {
             declare(parameter);
             define(parameter.lexeme);
-            scopes.peek().initialize(parameter.lexeme);
+            initialize(parameter.lexeme);
         }
         resolve(expr.body);
         endScope();
@@ -343,6 +344,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     private void define(String name) {
         scopes.peek().define(name);
+    }
+
+    private void initialize(String name) {
+        scopes.peek().initialize(name);
     }
 
     private void beginScope() {
@@ -360,7 +365,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     public Void visitClassDeclStmt(ClassDeclStmt stmt) {
         declare(stmt.name);
         define(stmt.name.lexeme);
-        scopes.peek().initialize(stmt.name.lexeme);
+        initialize(stmt.name.lexeme);
         if (stmt.superclass != null) {
             resolve(stmt.superclass);
             beginScope();
@@ -382,6 +387,15 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
             endScope();
         }
         
+        return null;
+    }
+
+    @Override
+    public Void visitImportStmt(ImportStmt stmt) {
+        declare(stmt.libname);
+        define(stmt.libname.lexeme);
+        initialize(stmt.libname.lexeme);
+
         return null;
     }
 }

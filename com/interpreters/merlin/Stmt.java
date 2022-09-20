@@ -16,6 +16,7 @@ public abstract class Stmt {
 		R visitVarDeclStmt(VarDeclStmt stmt);
 		R visitFunDeclStmt(FunDeclStmt stmt);
 		R visitClassDeclStmt(ClassDeclStmt stmt);
+		R visitImportStmt(ImportStmt stmt);
 	}
 
 
@@ -163,6 +164,22 @@ public abstract class Stmt {
 		public final Token name;
 		public final  Expr.VariableExpr superclass;
 		public final  List<FunDeclStmt> methods;
+	}
+
+
+
+	public static class ImportStmt extends Stmt{
+		public ImportStmt(Token keyword, Token libname) {
+			this.keyword = keyword;
+			this.libname = libname;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitImportStmt(this);
+		}
+		public final Token keyword;
+		public final  Token libname;
 	}
 
 
