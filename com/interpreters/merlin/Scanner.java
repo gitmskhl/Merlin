@@ -75,6 +75,8 @@ public class Scanner {
             case ')': addToken(RIGHT_PAREN); break;
             case '{': addToken(LEFT_BRACE); break;
             case '}': addToken(RIGHT_BRACE); break;
+            case '[': addToken(LEFT_BRACKET); break;
+            case ']': addToken(RIGHT_BRACKET); break;
             case '+': addToken(match('=') ? PLUS_EQUAL : PLUS); break;
             case '-': addToken(match('=') ? MINUS_EQUAL : MINUS); break;
             case '*': addToken(match('=') ? STAR_EQUAL : STAR); break;

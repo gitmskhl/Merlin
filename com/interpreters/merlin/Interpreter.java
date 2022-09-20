@@ -12,6 +12,8 @@ import com.interpreters.merlin.Expr.CallExpr;
 import com.interpreters.merlin.Expr.FunctionExpr;
 import com.interpreters.merlin.Expr.GetExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
+import com.interpreters.merlin.Expr.ListExpr;
+import com.interpreters.merlin.Expr.ListGetExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
@@ -240,6 +242,24 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         instance.set(expr.property.lexeme, value);
 
         return value;
+    }
+
+    @Override
+    public Object visitListExpr(ListExpr expr) {
+        List<Object> elements = new ArrayList<>();
+        for (Expr element : expr.elements) elements.add(evaluate(element));
+
+        return new MerlinList(elements, expr.bracket);
+    }   
+
+    @Override
+    public Object visitListGetExpr(ListGetExpr expr) {
+        Object object = evaluate(expr.object);
+        if (!(object instanceof MerlinList)) {
+            throw new RuntimeError(expr.bracket, "Can't take index from non-list object.");
+        }
+        Object index = evaluate(expr.index);
+        return ((MerlinList) object).get(index, expr.bracket);
     }
 
     @Override
@@ -483,5 +503,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         environment.define(lib.alias, lib);
 
         return null;
-    }   
+    }
+
 }

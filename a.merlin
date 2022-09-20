@@ -1,11 +1,5 @@
+var arr = [5, 7, 1, 4, 3, -5, 9];
 
-var b = 2 + 2 * 2;
-
-import b as human;
-
-var Musa = human.Man("Musa", 23), Bob = human.Woman("Bob", 20);
-
-Musa.show();
-Bob.show();
-
-println(b);
+def sort(arr, begin, end) {
+    
+}

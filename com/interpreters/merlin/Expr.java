@@ -21,6 +21,8 @@ public abstract class Expr {
 		R visitThisExpr(ThisExpr expr);
 		R visitSuperExpr(SuperExpr expr);
 		R visitSuperCallExpr(SuperCallExpr expr);
+		R visitListExpr(ListExpr expr);
+		R visitListGetExpr(ListGetExpr expr);
 	}
 
 
@@ -246,6 +248,40 @@ public abstract class Expr {
 		}
 		public final Token keyword;
 		public final  List<Expr> arguments;
+	}
+
+
+
+	public static class ListExpr extends Expr{
+		public ListExpr(Token bracket, List<Expr> elements) {
+			this.bracket = bracket;
+			this.elements = elements;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitListExpr(this);
+		}
+		public final Token bracket;
+		public final  List<Expr> elements;
+	}
+
+
+
+	public static class ListGetExpr extends Expr{
+		public ListGetExpr(Expr object, Token bracket, Expr index) {
+			this.object = object;
+			this.bracket = bracket;
+			this.index = index;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitListGetExpr(this);
+		}
+		public final Expr object;
+		public final  Token bracket;
+		public final  Expr index;
 	}
 
 
