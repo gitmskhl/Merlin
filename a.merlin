@@ -1,10 +1,9 @@
 
 import b;
 
-var object = b.C();
 
 
-for (var i = 1; i < 5; i += 1) {
-    println(i, object.sqr(i), object.cube(i), object.fourth1(i), object.fourth2(i));
-}
+var Musa = b.Man("Musa", 23), Lena = b.Woman("Lena", 20);
 
+Musa.show();
+Lena.show();
