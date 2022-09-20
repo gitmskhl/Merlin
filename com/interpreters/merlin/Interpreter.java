@@ -1,5 +1,6 @@
 package com.interpreters.merlin;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
 import com.interpreters.merlin.Stmt.FunDeclStmt;
 import com.interpreters.merlin.Stmt.IFStmt;
+import com.interpreters.merlin.Stmt.ImportStmt;
 import com.interpreters.merlin.Stmt.RETURNStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
 import com.interpreters.merlin.Stmt.WHILEStmt;
@@ -31,6 +33,7 @@ import com.interpreters.merlin.nativeFunctions.Printf;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
+    private final String module;
     private final boolean mainThread;
     private final Map<String, MerlinLib> libs;
 
@@ -39,15 +42,21 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Map<Expr, Integer> distances;
 
-    Interpreter(Map<String, MerlinLib> libs, boolean mainThread) {
+    Interpreter(String module, Map<String, MerlinLib> libs, boolean mainThread) {
+        this.module = module;
         this.libs = libs;
         this.mainThread = mainThread;
         global.define("print", new Printf(""));
         global.define("println", new Printf("\n"));
+        this.libs.put(module, new MerlinLib(module, global));
     }
 
-    Interpreter() {
-        this(new HashMap<>(), true);
+    Interpreter(String module) {
+        this(module, new HashMap<>(), true);
+    }
+
+    public void addDistances(Map<Expr, Integer> anotherDistances) {
+        anotherDistances.putAll(distances);
     }
 
     public boolean isMain() {
@@ -58,14 +67,23 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         this.distances = distances;
     }
 
-    public void interprete(List<Stmt> statements) {
+    public Environment interpreteAll(List<Stmt> statements) {
         try {
             for (Stmt statement : statements) 
                 execute(statement);
+            
+            return global;
         }
         catch(RuntimeError error) {
-            Merlin.runtimeError(error.token, error.message);
+            if (!mainThread) throw error;
+            if (!error.dummy) Merlin.runtimeError(error.token, error.message);
+
+            return null;
         }
+    }
+
+    private void interprete(List<Stmt> statements) {
+        for (Stmt statement : statements) execute(statement);
     }
 
     public void execute(Stmt stmt) {
@@ -198,11 +216,15 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitGetExpr(GetExpr expr) {
         Object object = evaluate(expr.object);
-        if (!(object instanceof MerlinInstance)) {
-            throw new RuntimeError(expr.property, "Only instances have properties.");
+        if (object instanceof MerlinInstance) {
+            MerlinInstance instance = (MerlinInstance) object;
+            return instance.get(expr.property);
         }
-        MerlinInstance instance = (MerlinInstance) object;
-        return instance.get(expr.property);
+        else if (object instanceof MerlinLib) {
+            return ((MerlinLib) object).get(expr.property);
+        }
+
+        throw new RuntimeError(expr.property, "Only instances and modules have properties.");
     }
 
     @Override
@@ -410,6 +432,34 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         MerlinClass mc = new MerlinClass(stmt.name.lexeme, superclass, methods, constructor);
         environment.assign(stmt.name.lexeme, mc);
+
+        return null;
+    }
+
+    @Override
+    public Void visitImportStmt(ImportStmt stmt) {
+        
+        if (stmt.libname.lexeme.equals(module)) return null;
+
+        String fileName = stmt.libname.lexeme + ".merlin";
+
+        if (!libs.containsKey(stmt.libname.lexeme)) {
+            String source;
+            try {
+                source = Merlin.getSource(fileName);
+            }
+            catch (IOException exception) {
+                throw new RuntimeError(stmt.keyword, "No such file '" + fileName + "'.");
+            }
+            Interpreter newInterpreter = new Interpreter(stmt.libname.lexeme, libs, false);
+            Environment libEnvironment =  Merlin.run(newInterpreter, source, fileName);
+            newInterpreter.addDistances(distances);
+            MerlinLib lib = new MerlinLib(stmt.libname.lexeme, libEnvironment);
+            libs.put(lib.name, lib);
+        }
+
+        MerlinLib lib = libs.get(stmt.libname.lexeme);
+        environment.define(lib.name, lib);
 
         return null;
     }    

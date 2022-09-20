@@ -35,6 +35,7 @@ public class Scanner {
         keywords.put("true",   TRUE);
         keywords.put("var",    VAR);
         keywords.put("while",  WHILE);
+        keywords.put("import", IMPORT);
     }
 
 
@@ -199,7 +200,7 @@ public class Scanner {
     }
 
     private void error(String lexeme, String message) {
-        Merlin.error(line, position, lexeme, message);
+        Merlin.error(line, position, lexeme, message, file);
     }
 
     private void error(String message) {

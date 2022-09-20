@@ -1,29 +1,10 @@
 
-class A {
-    sqr(n) {
-        return n * n;
-    }
-}
+import b;
 
-class B : A {
-    cube(n) {
-        return super.sqr(n) * n;
-    }
-}
+var object = b.C();
 
-class C : B {
-    fourth(n) {
-        return this.cube(n) * n;
-    }
-
-    fourth2(n) {
-        return this.sqr(this.sqr(n));
-    }
-}
-
-var c = C();
 
 for (var i = 1; i < 5; i += 1) {
-    println(i + " " + c.sqr(i) + " " + c.cube(i) + " " + c.fourth(i) + " " + c.fourth2(i));
+    println(i, object.sqr(i), object.cube(i), object.fourth1(i), object.fourth2(i));
 }
 

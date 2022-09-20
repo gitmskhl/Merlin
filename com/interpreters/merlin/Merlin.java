@@ -12,7 +12,7 @@ import com.interpreters.tools.Printer;
 
 public class Merlin {
     
-    private static Interpreter interpreter = new Interpreter();
+    private static Interpreter interpreter;
 
     private static boolean hadError = false;
     private static boolean hadRuntimeError = false;
@@ -28,11 +28,17 @@ public class Merlin {
     }
 
     private static void runFile(String path) throws IOException {
+        interpreter = new Interpreter(path.split("\\.")[0]);
+        run(Merlin.interpreter, getSource(path), path);
+    }
+
+    public static String getSource(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-        run(Merlin.interpreter, new String(bytes, Charset.defaultCharset()), path);
+        return new String(bytes, Charset.defaultCharset());
     }
 
     private static void runPrompt() throws IOException {
+        interpreter = new Interpreter("this");
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
         
@@ -44,23 +50,29 @@ public class Merlin {
         }
     }
 
-    private static void run(Interpreter interpreter, String source, String fileName) {
+    public static Environment run(Interpreter interpreter, String source, String fileName) {
         Scanner scanner = new Scanner(source, fileName);
         List<Token> tokens = scanner.scanTokens();
 
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
         
-        if (hadError) return;
+        if (hadError) {
+            if (interpreter.isMain()) return null;
+            throw new RuntimeError();
+        }
 
         Resolver resolver = new Resolver();
         interpreter.setDistance(resolver.resolveStatements(statements));
 
-        if (hadError) return;
+        if (hadError) {
+            if (interpreter.isMain()) return null;
+            throw new RuntimeError();
+        }
 
         //System.out.println(new Printer().print(expr));
     
-        interpreter.interprete(statements);
+        return interpreter.interpreteAll(statements);
     }
 
     public static void runtimeError(Token token, String message) {
@@ -82,6 +94,7 @@ public class Merlin {
     private static void report(int line, int position, String lexeme, String message, String file) {
         System.err.println("In file: " + file +
             "\n[line " + line + ", position " + position + ", at '" + lexeme + "']: " + message);
+        System.out.println("\n");
     }
 
     public static void warning(Token token, String message) {
