@@ -38,7 +38,9 @@ public class Generate {
             "Set        : Expr object, Token property, Expr value",
             "This       : Token keyword",
             "Super      : Token keyword, Token property",
-            "SuperCall  : Token keyword, List<Expr> arguments"
+            "SuperCall  : Token keyword, List<Expr> arguments",
+            "List       : Token bracket, List<Expr> elements",
+            "ListGet    : Expr object, Token bracket, Expr index"
         ));
         
         defineAST(outputDir, "Stmt",  Arrays.asList(

@@ -13,6 +13,8 @@ import com.interpreters.merlin.Expr.CallExpr;
 import com.interpreters.merlin.Expr.FunctionExpr;
 import com.interpreters.merlin.Expr.GetExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
+import com.interpreters.merlin.Expr.ListExpr;
+import com.interpreters.merlin.Expr.ListGetExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
@@ -309,6 +311,19 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     public Void visitSetExpr(SetExpr expr) {
         resolve(expr.object);
         resolve(expr.value);
+        return null;
+    }
+
+    @Override
+    public Void visitListExpr(ListExpr expr) {
+        for (Expr element : expr.elements) resolve(element);
+        return null;
+    }
+
+    @Override
+    public Void visitListGetExpr(ListGetExpr expr) {
+        resolve(expr.object);
+        resolve(expr.index);
         return null;
     }
 

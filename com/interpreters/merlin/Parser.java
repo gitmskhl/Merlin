@@ -310,6 +310,12 @@ public class Parser {
                 Token property = consume(IDENTIFIER, "Expect property.");
                 expr = new Expr.GetExpr(expr, property);
             }
+            else if (match(LEFT_BRACKET)) {
+                Token bracket = previous();
+                Expr index = expression();
+                consume(RIGHT_BRACKET, "Expect ']' after index.");
+                expr = new Expr.ListGetExpr(expr, bracket, index);
+            }
             else break;
         }
 
@@ -338,6 +344,8 @@ public class Parser {
             }
         }
 
+        if (match(LEFT_BRACKET)) return parseList();
+
         if (match(LEFT_PAREN)) {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
@@ -347,6 +355,19 @@ public class Parser {
         throw error("Unexpected expression.");
     }
 
+
+    private Expr.ListExpr parseList() {
+        Token bracket = previous();
+        List<Expr> elements = new ArrayList<>();
+        if (!check(RIGHT_BRACKET)) {
+            do {
+                elements.add(expression());
+            } while(match(COMMA));
+        }
+
+        consume(RIGHT_BRACKET, "Expect ']' after list elements.");
+        return new Expr.ListExpr(bracket, elements);
+    }
 
     private Expr.FunctionExpr parseAnonymusFunction() {
         Token paren = consume(LEFT_PAREN, "Expect '(' before parameters.");
