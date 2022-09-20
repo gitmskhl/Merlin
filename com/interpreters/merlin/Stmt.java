@@ -169,9 +169,10 @@ public abstract class Stmt {
 
 
 	public static class ImportStmt extends Stmt{
-		public ImportStmt(Token keyword, Token libname) {
+		public ImportStmt(Token keyword, Token libname, Token alias) {
 			this.keyword = keyword;
 			this.libname = libname;
+			this.alias = alias;
 		}
 
 		@Override
@@ -180,6 +181,7 @@ public abstract class Stmt {
 		}
 		public final Token keyword;
 		public final  Token libname;
+		public final  Token alias;
 	}
 
 

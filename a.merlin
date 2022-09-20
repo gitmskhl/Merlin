@@ -1,9 +1,11 @@
 
-import b;
+var b = 2 + 2 * 2;
 
+import b as human;
 
-
-var Musa = b.Man("Musa", 23), Lena = b.Woman("Lena", 20);
+var Musa = human.Man("Musa", 23), Bob = human.Woman("Bob", 20);
 
 Musa.show();
-Lena.show();
+Bob.show();
+
+println(b);

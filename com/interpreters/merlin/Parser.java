@@ -61,8 +61,12 @@ public class Parser {
     private Stmt importStatement() {
         Token keyword = previous();
         Token libname = consume(IDENTIFIER, "Expect module name.");
+        Token alias = libname;
+        if (match(AS)) {
+            alias = consume(IDENTIFIER, "Expect alias.");
+        }
         consume(SEMICOLON, "Expect ';' after module name.");
-        return new Stmt.ImportStmt(keyword, libname);
+        return new Stmt.ImportStmt(keyword, libname, alias);
     }
 
     private Stmt classDeclarationStatement() {

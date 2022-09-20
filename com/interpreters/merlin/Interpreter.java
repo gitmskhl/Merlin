@@ -49,7 +49,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         this.mainThread = mainThread;
         global.define("print", new Printf(""));
         global.define("println", new Printf("\n"));
-        this.libs.put(module, new MerlinLib(module, global));
+        this.libs.put(module, new MerlinLib(module, module, global));
     }
 
     Interpreter(String module) {
@@ -475,12 +475,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             Interpreter newInterpreter = new Interpreter(stmt.libname.lexeme, libs, false);
             Environment libEnvironment =  Merlin.run(newInterpreter, source, fileName);
             newInterpreter.addDistances(distances);
-            MerlinLib lib = new MerlinLib(stmt.libname.lexeme, libEnvironment);
+            MerlinLib lib = new MerlinLib(stmt.libname.lexeme, stmt.alias.lexeme, libEnvironment);
             libs.put(lib.name, lib);
         }
 
         MerlinLib lib = libs.get(stmt.libname.lexeme);
-        environment.define(lib.name, lib);
+        environment.define(lib.alias, lib);
 
         return null;
     }   
