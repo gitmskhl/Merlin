@@ -12,6 +12,8 @@ import com.interpreters.merlin.Expr.CallExpr;
 import com.interpreters.merlin.Expr.FunctionExpr;
 import com.interpreters.merlin.Expr.GetExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
+import com.interpreters.merlin.Expr.ListExpr;
+import com.interpreters.merlin.Expr.ListGetExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
@@ -49,7 +51,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         this.mainThread = mainThread;
         global.define("print", new Printf(""));
         global.define("println", new Printf("\n"));
-        this.libs.put(module, new MerlinLib(module, global));
+        this.libs.put(module, new MerlinLib(module, module, global));
     }
 
     Interpreter(String module) {
@@ -240,6 +242,24 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         instance.set(expr.property.lexeme, value);
 
         return value;
+    }
+
+    @Override
+    public Object visitListExpr(ListExpr expr) {
+        List<Object> elements = new ArrayList<>();
+        for (Expr element : expr.elements) elements.add(evaluate(element));
+
+        return new MerlinList(elements, expr.bracket);
+    }   
+
+    @Override
+    public Object visitListGetExpr(ListGetExpr expr) {
+        Object object = evaluate(expr.object);
+        if (!(object instanceof MerlinList)) {
+            throw new RuntimeError(expr.bracket, "Can't take index from non-list object.");
+        }
+        Object index = evaluate(expr.index);
+        return ((MerlinList) object).get(index, expr.bracket);
     }
 
     @Override
@@ -475,13 +495,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             Interpreter newInterpreter = new Interpreter(stmt.libname.lexeme, libs, false);
             Environment libEnvironment =  Merlin.run(newInterpreter, source, fileName);
             newInterpreter.addDistances(distances);
-            MerlinLib lib = new MerlinLib(stmt.libname.lexeme, libEnvironment);
+            MerlinLib lib = new MerlinLib(stmt.libname.lexeme, stmt.alias.lexeme, libEnvironment);
             libs.put(lib.name, lib);
         }
 
         MerlinLib lib = libs.get(stmt.libname.lexeme);
-        environment.define(lib.name, lib);
+        environment.define(lib.alias, lib);
 
         return null;
-    }   
+    }
+
 }

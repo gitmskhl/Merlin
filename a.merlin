@@ -1,9 +1,5 @@
+var arr = [5, 7, 1, 4, 3, -5, 9];
 
-import b;
-
-
-
-var Musa = b.Man("Musa", 23), Lena = b.Woman("Lena", 20);
-
-Musa.show();
-Lena.show();
+def sort(arr, begin, end) {
+    
+}
