@@ -39,6 +39,7 @@ public class Parser {
     private Stmt declaration() {
         if (match(VAR)) return varDeclarationStatement();
         if (match(CLASS)) return classDeclarationStatement();
+        if (match(IMPORT)) return importStatement();
         if (check(DEF) && checkNext(IDENTIFIER)) {
             advance();
             return funDeclarationStatement("function");
@@ -55,6 +56,13 @@ public class Parser {
         if (match(RETURN)) return returnStatement();
 
         return expressionStatement();
+    }
+
+    private Stmt importStatement() {
+        Token keyword = previous();
+        Token libname = consume(IDENTIFIER, "Expect module name.");
+        consume(SEMICOLON, "Expect ';' after module name.");
+        return new Stmt.ImportStmt(keyword, libname);
     }
 
     private Stmt classDeclarationStatement() {
@@ -382,7 +390,8 @@ public class Parser {
                 operator.lexeme, 
                 operator.literal, 
                 operator.line, 
-                operator.position);
+                operator.position,
+                operator.file);
             
         return new Expr.BinaryExpr(expr, operation, value);
     }

@@ -1,0 +1,23 @@
+
+class A {
+    sqr(n) {
+        return n * n;
+    }
+}
+
+class B : A {
+    cube(n) {
+        return this.sqr(n) * n;
+    }
+}
+
+class C : B {
+    fourth1(n) {
+        return super.cube(n) * n;
+    }
+
+    fourth2(n) {
+        return this.sqr(super.sqr(n));
+    }
+}
+
