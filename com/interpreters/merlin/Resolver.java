@@ -429,9 +429,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitImportStmt(ImportStmt stmt) {
-        declare(stmt.libname);
-        define(stmt.libname.lexeme);
-        initialize(stmt.libname.lexeme);
+        declare(stmt.alias);
+        define(stmt.alias.lexeme);
+        initialize(stmt.alias.lexeme);
 
         return null;
     }
