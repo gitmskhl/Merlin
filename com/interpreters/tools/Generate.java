@@ -40,7 +40,8 @@ public class Generate {
             "Super      : Token keyword, Token property",
             "SuperCall  : Token keyword, List<Expr> arguments",
             "List       : Token bracket, List<Expr> elements",
-            "ListGet    : Expr object, Token bracket, Expr index"
+            "ListGet    : Expr object, Token bracket, Expr index",
+            "ListSet    : Expr.ListGetExpr getter, Expr value"
         ));
         
         defineAST(outputDir, "Stmt",  Arrays.asList(

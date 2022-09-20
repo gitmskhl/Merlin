@@ -14,6 +14,7 @@ import com.interpreters.merlin.Expr.GetExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.ListExpr;
 import com.interpreters.merlin.Expr.ListGetExpr;
+import com.interpreters.merlin.Expr.ListSetExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
@@ -32,6 +33,7 @@ import com.interpreters.merlin.Stmt.ImportStmt;
 import com.interpreters.merlin.Stmt.RETURNStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
 import com.interpreters.merlin.Stmt.WHILEStmt;
+import com.interpreters.merlin.nativeFunctions.Len;
 import com.interpreters.merlin.nativeFunctions.Printf;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
@@ -49,13 +51,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         this.module = module;
         this.libs = libs;
         this.mainThread = mainThread;
-        global.define("print", new Printf(""));
-        global.define("println", new Printf("\n"));
+        initNativeFunctions();
         this.libs.put(module, new MerlinLib(module, module, global));
     }
 
     Interpreter(String module) {
         this(module, new HashMap<>(), true);
+    }
+
+    private void initNativeFunctions() {
+        global.define("print", new Printf(""));
+        global.define("println", new Printf("\n"));
+        global.define("len", new Len());
     }
 
     public void addDistances(Map<Expr, Integer> anotherDistances) {
@@ -178,18 +185,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitVariableExpr(VariableExpr expr) {
-        if (distances.containsKey(expr)) {
-            return environment.get(expr.name.lexeme, distances.get(expr));
-        }
-        return global.get(expr.name.lexeme);
+        return environment.get(expr.name.lexeme, distances.get(expr));
     }
 
     @Override
     public Object visitAssignExpr(AssignExpr expr) {
         Object value = evaluate(expr.value);
-        if (distances.containsKey(expr.object)) {
-            environment.assign(expr.object.name.lexeme, value, distances.get(expr.object));
-        } else global.assign(expr.object.name.lexeme, value);
+        environment.assign(expr.object.name.lexeme, value, distances.get(expr.object));
         return value;
     }
 
@@ -260,6 +262,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
         Object index = evaluate(expr.index);
         return ((MerlinList) object).get(index, expr.bracket);
+    }
+
+    @Override
+    public Object visitListSetExpr(ListSetExpr expr) {
+        Object object = evaluate(expr.getter.object);
+        if (!(object instanceof MerlinList)) {
+            throw new RuntimeError(expr.getter.bracket, "Can't take index from non-list object.");
+        }
+        Object index = evaluate(expr.getter.index);
+        Object value = evaluate(expr.value);
+        ((MerlinList) object).set(index, value, expr.getter.bracket);
+        return value;
     }
 
     @Override
