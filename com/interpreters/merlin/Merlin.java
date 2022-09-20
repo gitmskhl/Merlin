@@ -88,7 +88,7 @@ public class Merlin {
 
     public static void runtimeError(Token token, String message) {
         hadRuntimeError = true;
-        System.err.println("Runtime Error: ");
+        System.err.println(ConsoleColor.RED + "Runtime Error: ");
         report(token.line, token.position, token.lexeme, message, token.file);
     }
 
