@@ -1,23 +1,25 @@
 
-class A {
-    sqr(n) {
-        return n * n;
+class Human {
+    init(name, age, sex) {
+        this.name = name;
+        this.age = age;
+        this.sex = sex;
+    }
+
+    show() {
+        println(this.name, this.age, this.sex);
     }
 }
 
-class B : A {
-    cube(n) {
-        return this.sqr(n) * n;
+class Man : Human {
+    init(name, age) {
+        super(name, age, "male");
     }
 }
 
-class C : B {
-    fourth1(n) {
-        return super.cube(n) * n;
-    }
-
-    fourth2(n) {
-        return this.sqr(super.sqr(n));
+class Woman : Human {
+    init(name, age) {
+        super(name, age, "female");
     }
 }
 

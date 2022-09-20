@@ -326,9 +326,16 @@ public class Parser {
         if (match(THIS)) return new Expr.ThisExpr(previous());
         if (match(SUPER)) {
             Token keyword = previous();
-            consume(DOT, "Expect '.' after 'super'.");
-            Token property = consume(IDENTIFIER, "Expect property.");
-            return new Expr.SuperExpr(keyword, property);
+            if (match(DOT)) {
+                //consume(DOT, "Expect '.' after 'super'.");
+                Token property = consume(IDENTIFIER, "Expect property.");
+                return new Expr.SuperExpr(keyword, property);
+            }
+            else {
+                consume(LEFT_PAREN, "Expect '.' or '(' after 'super'.");
+                List<Expr> arguments = parseArguments();
+                return new Expr.SuperCallExpr(keyword, arguments);
+            }
         }
 
         if (match(LEFT_PAREN)) {
