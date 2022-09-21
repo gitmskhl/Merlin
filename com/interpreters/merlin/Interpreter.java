@@ -546,21 +546,29 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitForEachStmt(ForEachStmt stmt) {
-        Object expr = evaluate(stmt.iterable);
-        if (!(expr instanceof MerlinIterable)) {
-            throw new RuntimeError(stmt.in, "Expression after 'in' must be iterable.");
+        Environment newEnv = new Environment(environment);
+        Environment tmp = environment;
+
+        try {
+            environment = newEnv;
+            Object expr = evaluate(stmt.iterable);
+            if (!(expr instanceof MerlinIterable)) {
+                throw new RuntimeError(stmt.in, "Expression after 'in' must be iterable.");
+            }
+
+            MerlinIterable iterable = (MerlinIterable) expr;
+
+            for (; !iterable.isAtEnd(); ) {
+                environment.assign(stmt.iter.name.lexeme, iterable.next(), distances.get(stmt.iter));
+                execute(stmt.body);
+            }
+
+            iterable.reset();
+            return null;
         }
-
-        MerlinIterable iterable = (MerlinIterable) expr;
-
-        for (; !iterable.isAtEnd(); ) {
-            environment.assign(stmt.iter.name.lexeme, iterable.next(), distances.get(stmt.iter));
-            execute(stmt.body);
+        finally {
+            environment = tmp;
         }
-
-        iterable.reset();
-
-        return null;
     }
 
 }
