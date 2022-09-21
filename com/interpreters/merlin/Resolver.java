@@ -401,6 +401,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         scopes.peek().define(name);
     }
 
+    private void defineNative(String name) {
+        scopes.peek().defineNative(name);
+    }
+
     private void initialize(String name) {
         scopes.peek().initialize(name);
     }
@@ -462,9 +466,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitForEachStmt(ForEachStmt stmt) {
+        beginScope();
+        defineNative(stmt.iter.name.lexeme);
         resolve(stmt.iter);
         resolve(stmt.iterable);
         resolve(stmt.body);
+        endScope();
         return null;
     }
 

@@ -1,6 +1,9 @@
 
 var arr = range(5);
 
-import b;
+var x = 1;
 
-b.show(arr);
+for x in arr println(x);
+
+
+println(x);
