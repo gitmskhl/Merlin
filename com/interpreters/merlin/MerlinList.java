@@ -3,7 +3,7 @@ package com.interpreters.merlin;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MerlinList implements MerlinLenable {
+public class MerlinList implements MerlinLenable, Container {
 
     private final Token bracket;
     private final List<Object> list;
@@ -103,6 +103,34 @@ public class MerlinList implements MerlinLenable {
             result += Interpreter.stringify(list.get(list.size() - 1));
         }
         return result + "]";
+    }
+
+    @Override
+    public void add(Object object) {
+        list.add(object);
+    }
+
+    @Override
+    public Object get(Object object) {
+        return get(object, bracket);
+    }
+
+    @Override
+    public Object length() {
+        return size() * 1.0;
+    }
+
+    @Override
+    public Object pop() {
+        if (list.isEmpty()) throw new RuntimeError(bracket, "List is empty");
+        Object result = list.get(list.size() - 1);
+        list.remove(list.size() - 1);
+        return result;
+    }
+
+    @Override
+    public Object isEmpty() {
+        return list.isEmpty();
     }
 
 }

@@ -1,8 +1,4 @@
 
-def f() {
-    return [1, 5, -3, 6, 8, 10, 23, 2];
-}
+var arr = range(11);
 
-
-println(f()[range(5)]);
-
+println(arr[range(0, 11, 2)]);
