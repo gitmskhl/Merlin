@@ -3,10 +3,12 @@ package com.interpreters.merlin;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MerlinList implements MerlinLenable, Container {
+public class MerlinList implements MerlinLenable, Container, MerlinIterable {
 
     private final Token bracket;
     private final List<Object> list;
+
+    private int current = 0;
 
     public MerlinList(List<Object> list, Token bracket) {
         this.list = list;
@@ -131,6 +133,21 @@ public class MerlinList implements MerlinLenable, Container {
     @Override
     public Object isEmpty() {
         return list.isEmpty();
+    }
+
+    @Override
+    public Object next() {
+        return list.get(current++);
+    }
+
+    @Override
+    public boolean isAtEnd() {
+        return current == list.size();
+    }
+
+    @Override
+    public void reset() {
+        current = 0;
     }
 
 }

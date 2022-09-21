@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.interpreters.merlin.Expr.VariableExpr;
 import com.interpreters.merlin.Stmt.FunDeclStmt;
 
 import static com.interpreters.merlin.TokenType.*;
@@ -52,10 +53,21 @@ public class Parser {
         if (match(LEFT_BRACE)) return blockStatement();
         if (match(IF)) return ifStatement();
         if (match(WHILE)) return whileStatement();
-        if (match(FOR)) return forStatement();
         if (match(RETURN)) return returnStatement();
+        if (check(FOR) && checkNext(IDENTIFIER)) {advance(); return forEachStatement();}
+        if (match(FOR)) return forStatement();
 
         return expressionStatement();
+    }
+
+    private Stmt forEachStatement() {
+        Expr expr = primary();
+        if (!(expr instanceof Expr.VariableExpr)) throw error(previous(), "Expect iterator variable.");
+        VariableExpr iter = (VariableExpr) expr;
+        Token in = consume(IN, "Expect 'in' after iterator variable.");
+        Expr iterable = expression();
+        Stmt body = statement();
+        return new Stmt.ForEachStmt(iter, in, iterable, body);
     }
 
     private Stmt importStatement() {

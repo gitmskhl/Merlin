@@ -51,6 +51,7 @@ public class Generate {
             "WHILE      : Expr condition, Stmt body",
             "FOR        : Stmt initializer, Expr condition, Expr increment, Stmt body",
             "RETURN     : Token keyword, Expr value",
+            "ForEach    : Expr.VariableExpr iter, Token in, Expr iterable, Stmt body",
 
             "VarDecl    : List<Token> names, List<Expr> initializers",
             "FunDecl    : Token name, Expr.FunctionExpr description",
