@@ -235,9 +235,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
         else if (object instanceof MerlinLib) {
             return ((MerlinLib) object).get(expr.property);
+        } else if (object instanceof Container) {
+            return handleContainer((Container) object, expr.property);
         }
 
         throw new RuntimeError(expr.property, "Only instances and modules have properties.");
+    }
+
+    private Object handleContainer(Container container, Token property) {
+        String method;
+        if (property.lexeme.equals("add")) method = "add";
+        else if (property.lexeme.equals("get")) method = "get";
+        else if (property.lexeme.equals("length")) method = "length";
+        else if (property.lexeme.equals("isEmpty")) method = "isEmpty";
+        else if (property.lexeme.equals("pop")) method = "pop";
+        else {
+            throw new RuntimeError(property, 
+                "Container object doesn't have '" + property.lexeme + "' method."); 
+        }
+        return new MFContainer(container, method);
     }
 
     @Override
