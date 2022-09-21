@@ -28,6 +28,7 @@ import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ClassDeclStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
+import com.interpreters.merlin.Stmt.ForEachStmt;
 import com.interpreters.merlin.Stmt.FunDeclStmt;
 import com.interpreters.merlin.Stmt.IFStmt;
 import com.interpreters.merlin.Stmt.ImportStmt;
@@ -456,6 +457,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         define(stmt.alias.lexeme);
         initialize(stmt.alias.lexeme);
 
+        return null;
+    }
+
+    @Override
+    public Void visitForEachStmt(ForEachStmt stmt) {
+        resolve(stmt.iter);
+        resolve(stmt.iterable);
+        resolve(stmt.body);
         return null;
     }
 

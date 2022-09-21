@@ -27,6 +27,7 @@ import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ClassDeclStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
+import com.interpreters.merlin.Stmt.ForEachStmt;
 import com.interpreters.merlin.Stmt.FunDeclStmt;
 import com.interpreters.merlin.Stmt.IFStmt;
 import com.interpreters.merlin.Stmt.ImportStmt;
@@ -539,6 +540,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         MerlinLib lib = libs.get(stmt.libname.lexeme);
         environment.define(lib.alias, lib);
+
+        return null;
+    }
+
+    @Override
+    public Void visitForEachStmt(ForEachStmt stmt) {
+        Object expr = evaluate(stmt.iterable);
+        if (!(expr instanceof MerlinIterable)) {
+            throw new RuntimeError(stmt.in, "Expression after 'in' must be iterable.");
+        }
+
+        MerlinIterable iterable = (MerlinIterable) expr;
+
+        for (; !iterable.isAtEnd(); ) {
+            environment.assign(stmt.iter.name.lexeme, iterable.next(), distances.get(stmt.iter));
+            execute(stmt.body);
+        }
+
+        iterable.reset();
 
         return null;
     }
