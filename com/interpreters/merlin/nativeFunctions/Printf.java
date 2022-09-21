@@ -15,7 +15,7 @@ public class Printf implements MerlinCallable {
 
     @Override
     public int arity() {
-        return -1;
+        return -256;
     }
 
     @Override

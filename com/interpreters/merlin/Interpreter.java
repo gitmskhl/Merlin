@@ -14,6 +14,7 @@ import com.interpreters.merlin.Expr.GetExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.ListExpr;
 import com.interpreters.merlin.Expr.ListGetExpr;
+import com.interpreters.merlin.Expr.ListSetExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
@@ -26,13 +27,16 @@ import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ClassDeclStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
+import com.interpreters.merlin.Stmt.ForEachStmt;
 import com.interpreters.merlin.Stmt.FunDeclStmt;
 import com.interpreters.merlin.Stmt.IFStmt;
 import com.interpreters.merlin.Stmt.ImportStmt;
 import com.interpreters.merlin.Stmt.RETURNStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
 import com.interpreters.merlin.Stmt.WHILEStmt;
+import com.interpreters.merlin.nativeFunctions.Len;
 import com.interpreters.merlin.nativeFunctions.Printf;
+import com.interpreters.merlin.nativeFunctions.Range;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -49,13 +53,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         this.module = module;
         this.libs = libs;
         this.mainThread = mainThread;
-        global.define("print", new Printf(""));
-        global.define("println", new Printf("\n"));
+        initNativeFunctions();
         this.libs.put(module, new MerlinLib(module, module, global));
     }
 
     Interpreter(String module) {
         this(module, new HashMap<>(), true);
+    }
+
+    private void initNativeFunctions() {
+        global.define("print", new Printf(""));
+        global.define("println", new Printf("\n"));
+        global.define("len", new Len());
+        global.define("range", new Range());
     }
 
     public void addDistances(Map<Expr, Integer> anotherDistances) {
@@ -178,18 +188,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitVariableExpr(VariableExpr expr) {
-        if (distances.containsKey(expr)) {
-            return environment.get(expr.name.lexeme, distances.get(expr));
-        }
-        return global.get(expr.name.lexeme);
+        return environment.get(expr.name.lexeme, distances.get(expr));
     }
 
     @Override
     public Object visitAssignExpr(AssignExpr expr) {
         Object value = evaluate(expr.value);
-        if (distances.containsKey(expr.object)) {
-            environment.assign(expr.object.name.lexeme, value, distances.get(expr.object));
-        } else global.assign(expr.object.name.lexeme, value);
+        environment.assign(expr.object.name.lexeme, value, distances.get(expr.object));
         return value;
     }
 
@@ -203,8 +208,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         MerlinCallable callee = (MerlinCallable) object;
 
-        if (callee.arity() != -1) {
-            if (callee.arity() != expr.arguments.size()) {
+        if (callee.arity() != -256) {
+            if (callee.arity() < 0) {
+                if (expr.arguments.size() > -callee.arity()) {
+                    throw new RuntimeError(expr.paren, 
+                    "Expected no more than " + (-callee.arity()) +" arguments but got " + expr.arguments.size() + ".");
+                }
+            }
+            else if (callee.arity() != expr.arguments.size()) {
                 throw new RuntimeError(expr.paren, 
                     "Expected " + callee.arity() + " arguments but got " + expr.arguments.size() + ".");
             }
@@ -225,9 +236,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
         else if (object instanceof MerlinLib) {
             return ((MerlinLib) object).get(expr.property);
+        } else if (object instanceof Container) {
+            return handleContainer((Container) object, expr.property);
         }
 
         throw new RuntimeError(expr.property, "Only instances and modules have properties.");
+    }
+
+    private Object handleContainer(Container container, Token property) {
+        String method;
+        if (property.lexeme.equals("add")) method = "add";
+        else if (property.lexeme.equals("get")) method = "get";
+        else if (property.lexeme.equals("length")) method = "length";
+        else if (property.lexeme.equals("isEmpty")) method = "isEmpty";
+        else if (property.lexeme.equals("pop")) method = "pop";
+        else {
+            throw new RuntimeError(property, 
+                "Container object doesn't have '" + property.lexeme + "' method."); 
+        }
+        return new MFContainer(container, method);
     }
 
     @Override
@@ -260,6 +287,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
         Object index = evaluate(expr.index);
         return ((MerlinList) object).get(index, expr.bracket);
+    }
+
+    @Override
+    public Object visitListSetExpr(ListSetExpr expr) {
+        Object object = evaluate(expr.getter.object);
+        if (!(object instanceof MerlinList)) {
+            throw new RuntimeError(expr.getter.bracket, "Can't take index from non-list object.");
+        }
+        Object index = evaluate(expr.getter.index);
+        Object value = evaluate(expr.value);
+        ((MerlinList) object).set(index, value, expr.getter.bracket);
+        return value;
     }
 
     @Override
@@ -501,6 +540,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         MerlinLib lib = libs.get(stmt.libname.lexeme);
         environment.define(lib.alias, lib);
+
+        return null;
+    }
+
+    @Override
+    public Void visitForEachStmt(ForEachStmt stmt) {
+        Object expr = evaluate(stmt.iterable);
+        if (!(expr instanceof MerlinIterable)) {
+            throw new RuntimeError(stmt.in, "Expression after 'in' must be iterable.");
+        }
+
+        MerlinIterable iterable = (MerlinIterable) expr;
+
+        for (; !iterable.isAtEnd(); ) {
+            environment.assign(stmt.iter.name.lexeme, iterable.next(), distances.get(stmt.iter));
+            execute(stmt.body);
+        }
+
+        iterable.reset();
 
         return null;
     }

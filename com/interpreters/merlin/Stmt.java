@@ -13,6 +13,7 @@ public abstract class Stmt {
 		R visitWHILEStmt(WHILEStmt stmt);
 		R visitFORStmt(FORStmt stmt);
 		R visitRETURNStmt(RETURNStmt stmt);
+		R visitForEachStmt(ForEachStmt stmt);
 		R visitVarDeclStmt(VarDeclStmt stmt);
 		R visitFunDeclStmt(FunDeclStmt stmt);
 		R visitClassDeclStmt(ClassDeclStmt stmt);
@@ -114,6 +115,26 @@ public abstract class Stmt {
 		}
 		public final Token keyword;
 		public final  Expr value;
+	}
+
+
+
+	public static class ForEachStmt extends Stmt{
+		public ForEachStmt(Expr.VariableExpr iter, Token in, Expr iterable, Stmt body) {
+			this.iter = iter;
+			this.in = in;
+			this.iterable = iterable;
+			this.body = body;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitForEachStmt(this);
+		}
+		public final Expr.VariableExpr iter;
+		public final  Token in;
+		public final  Expr iterable;
+		public final  Stmt body;
 	}
 
 

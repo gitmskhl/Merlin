@@ -15,6 +15,7 @@ import com.interpreters.merlin.Expr.GetExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
 import com.interpreters.merlin.Expr.ListExpr;
 import com.interpreters.merlin.Expr.ListGetExpr;
+import com.interpreters.merlin.Expr.ListSetExpr;
 import com.interpreters.merlin.Expr.LiteralExpr;
 import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
@@ -27,6 +28,7 @@ import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ClassDeclStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
+import com.interpreters.merlin.Stmt.ForEachStmt;
 import com.interpreters.merlin.Stmt.FunDeclStmt;
 import com.interpreters.merlin.Stmt.IFStmt;
 import com.interpreters.merlin.Stmt.ImportStmt;
@@ -138,6 +140,8 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         Scope scope = scopes.peek();
         scope.defineNative("print");
         scope.defineNative("println");
+        scope.defineNative("len");
+        scope.defineNative("range");
     }
 
     private void resolve(List<Stmt> statements) {
@@ -163,9 +167,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
                     Merlin.error(name, "Can't read local variable in its own initializer.");
                 }
 
-                if (i != 0) {
-                    distances.put(expr, scopes.size() - 1 - i);
-                }
+                distances.put(expr, scopes.size() - 1 - i);
 
                 if (!scopes.get(i).isInitialized(name.lexeme)) {
                     if (!showWarnings) return;
@@ -328,6 +330,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitListSetExpr(ListSetExpr expr) {
+        resolve(expr.getter);
+        resolve(expr.value);
+        return null;
+    }
+
+    @Override
     public Void visitThisExpr(ThisExpr expr) {
         if (currentClass == ClassType.NONE) {
             Merlin.error(expr.keyword, "Can't use 'this' outside of a class.");
@@ -450,4 +459,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
         return null;
     }
+
+    @Override
+    public Void visitForEachStmt(ForEachStmt stmt) {
+        resolve(stmt.iter);
+        resolve(stmt.iterable);
+        resolve(stmt.body);
+        return null;
+    }
+
 }

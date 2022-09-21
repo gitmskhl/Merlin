@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.interpreters.merlin.Expr.VariableExpr;
 import com.interpreters.merlin.Stmt.FunDeclStmt;
 
 import static com.interpreters.merlin.TokenType.*;
@@ -52,10 +53,21 @@ public class Parser {
         if (match(LEFT_BRACE)) return blockStatement();
         if (match(IF)) return ifStatement();
         if (match(WHILE)) return whileStatement();
-        if (match(FOR)) return forStatement();
         if (match(RETURN)) return returnStatement();
+        if (check(FOR) && checkNext(IDENTIFIER)) {advance(); return forEachStatement();}
+        if (match(FOR)) return forStatement();
 
         return expressionStatement();
+    }
+
+    private Stmt forEachStatement() {
+        Expr expr = primary();
+        if (!(expr instanceof Expr.VariableExpr)) throw error(previous(), "Expect iterator variable.");
+        VariableExpr iter = (VariableExpr) expr;
+        Token in = consume(IN, "Expect 'in' after iterator variable.");
+        Expr iterable = expression();
+        Stmt body = statement();
+        return new Stmt.ForEachStmt(iter, in, iterable, body);
     }
 
     private Stmt importStatement() {
@@ -207,6 +219,15 @@ public class Parser {
 
                 Expr.GetExpr get = (Expr.GetExpr) expr;
                 return new Expr.SetExpr(get.object, get.property, value);
+            }
+            else if (expr instanceof Expr.ListGetExpr) {
+                Token operator = previous();
+                Expr value = assignment();
+
+                if (operator.type != EQUAL) value = replaceOperator(operator, expr, value);
+                
+                Expr.ListGetExpr getter = (Expr.ListGetExpr) expr;
+                return new Expr.ListSetExpr(getter, value);
             }
 
             throw error("Can't assign a non-variable type value.");

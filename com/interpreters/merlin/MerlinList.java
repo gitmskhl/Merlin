@@ -3,10 +3,12 @@ package com.interpreters.merlin;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MerlinList {
+public class MerlinList implements MerlinLenable, Container, MerlinIterable {
 
     private final Token bracket;
     private final List<Object> list;
+
+    private int current = 0;
 
     public MerlinList(List<Object> list, Token bracket) {
         this.list = list;
@@ -15,6 +17,49 @@ public class MerlinList {
 
     public int size() {
         return list.size();
+    }
+
+    public void set(Object index, Object value, Token bracket) {
+        if (index instanceof Double) setDouble((double) index, value, bracket);
+        else if (index instanceof MerlinList) setList((MerlinList) index, value, bracket);
+        else throw new RuntimeError(bracket, "Index must be an integer.");
+    }
+
+    private void setDouble(double n, Object value, Token bracket) {
+        if (n % 1 != 0) throw new RuntimeError(bracket, "Index must be an integer.");
+        int index = (int)n;
+        setIndex(index, value, bracket);
+    }
+
+    private void setList(MerlinList indexes, Object value, Token bracket) {
+        if (value instanceof MerlinList) {
+            MerlinList lst = (MerlinList) value;
+
+            if (indexes.size() != lst.size()) {
+                throw new RuntimeError(bracket, 
+                    "The sizes of index list " + indexes.size() + " and value list " + lst.size() + " must match.");
+            }
+
+            int i = 0;
+            for (Object obj : indexes.list) {
+                if (!checkInt(obj)) throw new RuntimeError(bracket, "The list argument(position " + i + " in the list) must be an integer.");
+                setIndex((int)((double)obj), lst.list.get(i), bracket);
+                i += 1;
+            }
+        }
+        else {
+            int i = 0;
+            for (Object obj : indexes.list) {
+                if (!checkInt(obj)) throw new RuntimeError(bracket, "The list argument(position " + i + " in the list) must be an integer.");
+                setIndex((int)((double)obj), value, bracket);
+                i += 1;
+            }
+        }
+    }
+
+    private void setIndex (int index, Object value, Token bracket) {
+        if (index < 0 || index >= list.size()) throw new RuntimeError(bracket, "List index out of range.");
+        list.set(index, value);
     }
 
     public Object get(Object index, Token bracket) {
@@ -60,6 +105,49 @@ public class MerlinList {
             result += Interpreter.stringify(list.get(list.size() - 1));
         }
         return result + "]";
+    }
+
+    @Override
+    public void add(Object object) {
+        list.add(object);
+    }
+
+    @Override
+    public Object get(Object object) {
+        return get(object, bracket);
+    }
+
+    @Override
+    public Object length() {
+        return size() * 1.0;
+    }
+
+    @Override
+    public Object pop() {
+        if (list.isEmpty()) throw new RuntimeError(bracket, "List is empty");
+        Object result = list.get(list.size() - 1);
+        list.remove(list.size() - 1);
+        return result;
+    }
+
+    @Override
+    public Object isEmpty() {
+        return list.isEmpty();
+    }
+
+    @Override
+    public Object next() {
+        return list.get(current++);
+    }
+
+    @Override
+    public boolean isAtEnd() {
+        return current == list.size();
+    }
+
+    @Override
+    public void reset() {
+        current = 0;
     }
 
 }
