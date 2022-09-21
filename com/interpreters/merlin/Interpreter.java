@@ -35,6 +35,7 @@ import com.interpreters.merlin.Stmt.VarDeclStmt;
 import com.interpreters.merlin.Stmt.WHILEStmt;
 import com.interpreters.merlin.nativeFunctions.Len;
 import com.interpreters.merlin.nativeFunctions.Printf;
+import com.interpreters.merlin.nativeFunctions.Range;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -63,6 +64,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         global.define("print", new Printf(""));
         global.define("println", new Printf("\n"));
         global.define("len", new Len());
+        global.define("range", new Range());
     }
 
     public void addDistances(Map<Expr, Integer> anotherDistances) {
@@ -205,8 +207,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         MerlinCallable callee = (MerlinCallable) object;
 
-        if (callee.arity() != -1) {
-            if (callee.arity() != expr.arguments.size()) {
+        if (callee.arity() != -256) {
+            if (callee.arity() < 0) {
+                if (expr.arguments.size() > -callee.arity()) {
+                    throw new RuntimeError(expr.paren, 
+                    "Expected no more than " + (-callee.arity()) +" arguments but got " + expr.arguments.size() + ".");
+                }
+            }
+            else if (callee.arity() != expr.arguments.size()) {
                 throw new RuntimeError(expr.paren, 
                     "Expected " + callee.arity() + " arguments but got " + expr.arguments.size() + ".");
             }
