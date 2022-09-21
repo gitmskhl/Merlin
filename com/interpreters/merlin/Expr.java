@@ -23,6 +23,7 @@ public abstract class Expr {
 		R visitSuperCallExpr(SuperCallExpr expr);
 		R visitListExpr(ListExpr expr);
 		R visitListGetExpr(ListGetExpr expr);
+		R visitListSetExpr(ListSetExpr expr);
 	}
 
 
@@ -282,6 +283,22 @@ public abstract class Expr {
 		public final Expr object;
 		public final  Token bracket;
 		public final  Expr index;
+	}
+
+
+
+	public static class ListSetExpr extends Expr{
+		public ListSetExpr(Expr.ListGetExpr getter, Expr value) {
+			this.getter = getter;
+			this.value = value;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitListSetExpr(this);
+		}
+		public final Expr.ListGetExpr getter;
+		public final  Expr value;
 	}
 
 

@@ -1,24 +1,16 @@
 
-class Human {
-    init(name, age, sex) {
-        this.name = name;
-        this.age = age;
-        this.sex = sex;
-    }
-
-    show() {
-        println(this.name, this.age, this.sex);
-    }
+def swap(arr, i, j) {
+    var tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
 }
 
-class Man : Human {
-    init(name, age) {
-        super(name, age, "male");
-    }
-}
-
-class Woman : Human {
-    init(name, age) {
-        super(name, age, "female");
+def sort(arr) {
+    for (var i = 0, end = len(arr); i < end; i += 1) {
+        var j = i;
+        while (j > 0 and arr[j] < arr[j - 1]) {
+            swap(arr, j, j - 1);
+            j -= 1;
+        }
     }
 }

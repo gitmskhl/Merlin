@@ -208,6 +208,15 @@ public class Parser {
                 Expr.GetExpr get = (Expr.GetExpr) expr;
                 return new Expr.SetExpr(get.object, get.property, value);
             }
+            else if (expr instanceof Expr.ListGetExpr) {
+                Token operator = previous();
+                Expr value = assignment();
+
+                if (operator.type != EQUAL) value = replaceOperator(operator, expr, value);
+                
+                Expr.ListGetExpr getter = (Expr.ListGetExpr) expr;
+                return new Expr.ListSetExpr(getter, value);
+            }
 
             throw error("Can't assign a non-variable type value.");
         }
