@@ -1,0 +1,18 @@
+
+
+class matrix {
+
+    init(mat) {
+        this.mat = mat;
+    }
+
+    size() {
+        return [this.mat.length(), this.mat[0].length()];
+    }
+
+
+
+}
+
+
+

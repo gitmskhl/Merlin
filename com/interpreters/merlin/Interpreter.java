@@ -224,7 +224,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         List<Object> arguments = new ArrayList<>();
         for (Expr arg : expr.arguments) arguments.add(evaluate(arg));
 
-        return callee.call(this, arguments);
+        return callee.call(this, arguments, expr.paren);
     }
 
     @Override
@@ -236,25 +236,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
         else if (object instanceof MerlinLib) {
             return ((MerlinLib) object).get(expr.property);
-        } else if (object instanceof Container) {
-            return handleContainer((Container) object, expr.property);
         }
 
         throw new RuntimeError(expr.property, "Only instances and modules have properties.");
-    }
-
-    private Object handleContainer(Container container, Token property) {
-        String method;
-        if (property.lexeme.equals("add")) method = "add";
-        else if (property.lexeme.equals("get")) method = "get";
-        else if (property.lexeme.equals("length")) method = "length";
-        else if (property.lexeme.equals("isEmpty")) method = "isEmpty";
-        else if (property.lexeme.equals("pop")) method = "pop";
-        else {
-            throw new RuntimeError(property, 
-                "Container object doesn't have '" + property.lexeme + "' method."); 
-        }
-        return new MFContainer(container, method);
     }
 
     @Override
@@ -276,28 +260,28 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         List<Object> elements = new ArrayList<>();
         for (Expr element : expr.elements) elements.add(evaluate(element));
 
-        return new MerlinList(elements, expr.bracket);
+        return new MerlinListInstance(elements);
     }   
 
     @Override
     public Object visitListGetExpr(ListGetExpr expr) {
         Object object = evaluate(expr.object);
-        if (!(object instanceof MerlinList)) {
+        if (!(object instanceof MerlinListInstance)) {
             throw new RuntimeError(expr.bracket, "Can't take index from non-list object.");
         }
         Object index = evaluate(expr.index);
-        return ((MerlinList) object).get(index, expr.bracket);
+        return ((MerlinListInstance) object).get(index, expr.bracket);
     }
 
     @Override
     public Object visitListSetExpr(ListSetExpr expr) {
         Object object = evaluate(expr.getter.object);
-        if (!(object instanceof MerlinList)) {
+        if (!(object instanceof MerlinListInstance)) {
             throw new RuntimeError(expr.getter.bracket, "Can't take index from non-list object.");
         }
         Object index = evaluate(expr.getter.index);
         Object value = evaluate(expr.value);
-        ((MerlinList) object).set(index, value, expr.getter.bracket);
+        ((MerlinListInstance) object).set(index, value, expr.getter.bracket);
         return value;
     }
 
@@ -331,7 +315,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 
         MerlinInstance instance = (MerlinInstance) environment.get("this", distance - 1);
-        superclass.getConstructor().bind("this", instance).call(this, arguments);
+        superclass.getConstructor().bind("this", instance).call(this, arguments, expr.keyword);
         return null;
     } 
 

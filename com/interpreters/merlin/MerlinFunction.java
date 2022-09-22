@@ -22,7 +22,7 @@ public class MerlinFunction implements MerlinCallable {
     }
 
     @Override
-    public Object call(Interpreter interpreter, List<Object> arguments) {
+    public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
         Environment environment = new Environment(closure);
         for (int i = 0; i < arguments.size(); ++i) {
             environment.define(description.parameters.get(i).lexeme, arguments.get(i));

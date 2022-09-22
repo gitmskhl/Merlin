@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.interpreters.merlin.Interpreter;
 import com.interpreters.merlin.MerlinCallable;
+import com.interpreters.merlin.Token;
 
 public class Printf implements MerlinCallable {
 
@@ -19,7 +20,7 @@ public class Printf implements MerlinCallable {
     }
 
     @Override
-    public Object call(Interpreter interpreter, List<Object> arguments) {
+    public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
         for (Object object : arguments.subList(0, arguments.size() - 1)) {
             System.out.print(Interpreter.stringify(object).replace("\\n", "\n"));
             System.out.print(" ");
