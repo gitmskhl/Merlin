@@ -1,9 +1,11 @@
 
-var arr = range(5);
 
-var x = 1;
+var arr = range(10, -1, -1);
 
-for x in arr println(x);
+println(arr);
 
+import b;
 
-println(x);
+b.sort(arr);
+
+println(arr);

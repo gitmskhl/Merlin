@@ -26,9 +26,9 @@ public class MerlinClass implements MerlinCallable {
     }
 
     @Override
-    public Object call(Interpreter interpreter, List<Object> arguments) {
+    public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
         MerlinInstance instance =  new MerlinInstance(this);
-        if (constructor != null) constructor.bind("this", instance).call(interpreter, arguments);
+        if (constructor != null) constructor.bind("this", instance).call(interpreter, arguments, paren);
         return instance;
     }
 
