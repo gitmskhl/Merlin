@@ -1,9 +1,15 @@
 
-var arr = range(5);
+// [l, r)
+def bin_search(arr, key, l, r) {
+    while (r - l > 1) {
+        var mid = int((r + l) / 2);
+        if (arr[mid] > key) r = mid;
+        else l = mid;
+    }
 
-var x = 1;
+    return l;
+}
 
-for x in arr println(x);
+var n = 10000;
 
-
-println(x);
+println(bin_search(range(n), 7, 0, n));

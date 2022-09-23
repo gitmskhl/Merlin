@@ -4,12 +4,10 @@ import java.util.List;
 
 import com.interpreters.merlin.Interpreter;
 import com.interpreters.merlin.MerlinCallable;
-import com.interpreters.merlin.MerlinLenable;
 import com.interpreters.merlin.RuntimeError;
 import com.interpreters.merlin.Token;
-import com.interpreters.merlin.TokenType;
 
-public class Len implements MerlinCallable {
+public class Int implements MerlinCallable {
 
     @Override
     public int arity() {
@@ -19,9 +17,9 @@ public class Len implements MerlinCallable {
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
         Object obj = arguments.get(0);
-        if (obj instanceof MerlinLenable) return ((MerlinLenable) obj).size() * 1.0;
+        if (obj instanceof Double) return Math.floor(((double) obj));
         
-        throw new RuntimeError(paren,"object type has not len()");
+        throw new RuntimeError(paren, "Native function 'int': Can't convert argument to int.");
     }
-    
+
 }
