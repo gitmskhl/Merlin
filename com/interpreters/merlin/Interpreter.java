@@ -37,6 +37,7 @@ import com.interpreters.merlin.Stmt.WHILEStmt;
 import com.interpreters.merlin.nativeFunctions.Len;
 import com.interpreters.merlin.nativeFunctions.Printf;
 import com.interpreters.merlin.nativeFunctions.Range;
+import com.interpreters.merlin.nativeFunctions.Int;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -66,6 +67,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         global.define("println", new Printf("\n"));
         global.define("len", new Len());
         global.define("range", new Range());
+        global.define("int", new Int());
     }
 
     public void addDistances(Map<Expr, Integer> anotherDistances) {

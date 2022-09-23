@@ -73,6 +73,10 @@ public class MerlinListInstance extends MerlinInstance implements MerlinIterable
         set("pop", new pop(this));
     }
 
+    private int correctIndex(int index) {
+        return (index + list.size()) % list.size();
+    }
+
     class get implements MerlinCallable {
 
         private final MerlinListInstance instance;
@@ -101,10 +105,11 @@ public class MerlinListInstance extends MerlinInstance implements MerlinIterable
         private Object getDouble(double n) {
             if (n % 1 != 0) throw new RuntimeError(bracket, "Index must be an integer.");
             int index = (int)n;
-            return getIndex(index);
+            return getIndex(correctIndex(index));
         }
     
         private Object getIndex(int index) {
+            index = correctIndex(index);
             if (index < 0 || index >= instance.list.size()) throw new RuntimeError(bracket, "List index out of range.");
             return instance.list.get(index);
         }
@@ -198,6 +203,7 @@ public class MerlinListInstance extends MerlinInstance implements MerlinIterable
         private void setDouble(double n, Object value) {
             if (n % 1 != 0) throw new RuntimeError(bracket, "Index must be an integer.");
             int index = (int)n;
+            index = correctIndex(index);
             setIndex(index, value, bracket);
         }
     
@@ -228,6 +234,7 @@ public class MerlinListInstance extends MerlinInstance implements MerlinIterable
         }
     
         private void setIndex (int index, Object value, Token bracket) {
+            index = correctIndex(index);
             if (index < 0 || index >= instance.list.size()) throw new RuntimeError(bracket, "List index out of range.");
             instance.list.set(index, value);
         }

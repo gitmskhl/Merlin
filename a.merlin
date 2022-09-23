@@ -1,11 +1,15 @@
 
+// [l, r)
+def bin_search(arr, key, l, r) {
+    while (r - l > 1) {
+        var mid = int((r + l) / 2);
+        if (arr[mid] > key) r = mid;
+        else l = mid;
+    }
 
-var arr = range(10, -1, -1);
+    return l;
+}
 
-println(arr);
+var n = 10000;
 
-import b;
-
-b.sort(arr);
-
-println(arr);
+println(bin_search(range(n), 7, 0, n));
