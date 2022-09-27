@@ -4,8 +4,9 @@ runAll: clean compile run
 
 clean:
 	rm com/interpreters/merlin/*.class -f
-	rm com/interpreters/merlin/nativeFunctions/*.class
+	rm com/interpreters/merlin/nativeFunctions/*.class -f
 	rm com/interpreters/merlin/std/string/*.class -f
+	rm com/interpreters/merlin/std/map/*.class -f
 
 
 compile:

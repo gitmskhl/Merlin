@@ -110,7 +110,7 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
             if (index >= length()) throw new RuntimeError(paren, "String index out of range: index is too big.");
             index = (index + length()) % length();
             if (index < 0) throw new RuntimeError(paren, "String index out of range: index is very negative.");
-            return str.charAt(index);
+            return str.charAt(index) + "";
         }
 
         private Object getList(MerlinListInstance indexes) {
