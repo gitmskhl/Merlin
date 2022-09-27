@@ -2,10 +2,77 @@
 from std import string;
 
 
-def sqr(x) {
-    return x * x;
+class Scanner {
+
+    init(str) {
+        this.str = string.string(str);
+        this.current = this.start = 0;
+        this.tokens = [];
+    }
+
+    scan() {
+        while (!this.isAtEnd()) {
+            this.start = this.current;
+            var c = this.advance();
+            this.scanToken(c);
+        }
+    }
+
+    scanToken(c) {
+        if (c == "+") println("PLUS");
+        else if (c == "-") println("MINUS");
+        else if (c == "*") println("STAR");
+        else if (c == "/") println("SLASH");
+        else if (this.isDigit(c)) {
+            while (!this.isAtEnd() and this.isDigit(this.peek())) this.advance();
+            if (this.peek() == ".") {
+                this.advance();
+                while (!this.isAtEnd() and this.isDigit(this.peek())) this.advance();
+            }
+            println("NUMBER", this.str.substring(this.start, this.current));
+        }
+    }
+
+    isDigit(c) {
+        return c >= "0" and c <= "9";
+    }
+
+    isAtEnd() {
+        return this.current >= len(this.str);
+    }
+
+    peek() {
+        if (this.isAtEnd()) return "\0";
+        return this.str.getAt(this.current);
+    }
+
+    advance() {
+        if (this.isAtEnd()) return this.previous();
+        var res = this.peek();
+        this.current += 1;
+        return res;
+    }
+
+    previous() {
+        return this.str.getAt(this.current - 1);
+    }
+
+    match(expected) {
+        if (this.peek() == expected) {
+            this.current += 1;
+            return true;
+        }
+        return false;
+    }
+
 }
 
-var arr = range(1, 10);
 
-println(filter(sqr, arr));
+
+var source = input();
+
+var scanner = Scanner(source);
+
+scanner.scan();
+
+

@@ -338,9 +338,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private boolean less(Object left, Object right, Token operation) {
         if ((left instanceof Double) && (right instanceof Double)) return (double) left < (double) right;
+        if ((left instanceof String) && (right instanceof String))
+            return ((String) left).compareTo((String) right) < 0;
         if ((left instanceof String) && (right instanceof Double)) 
             return ((String) left).compareTo((String) right) < 0;
-        
+        if ((right instanceof String) && (left instanceof Double))
+            return ((String) left).compareTo((String) right) < 0;
         throw new RuntimeError(operation, "Operands must be two numbers or two strings.");
     }
 
