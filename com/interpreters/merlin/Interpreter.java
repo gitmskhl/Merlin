@@ -38,6 +38,7 @@ import com.interpreters.merlin.nativeFunctions.Len;
 import com.interpreters.merlin.nativeFunctions.Printf;
 import com.interpreters.merlin.nativeFunctions.Range;
 import com.interpreters.merlin.nativeFunctions.Int;
+import com.interpreters.merlin.std.map.map;
 import com.interpreters.merlin.std.string.string;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
@@ -526,6 +527,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 case "string":
                     objectName = "string";
                     object = new string();
+                    break;
+                case "map":
+                    objectName = "map";
+                    object = new map();
                     break;
                 default:
                     throw new RuntimeError(stmt.libname, 
