@@ -1,8 +1,0 @@
-
-println("double lib");
-
-
-def libFunction(msg, n) {
-    println("Lib2 function works");
-    for i in range(n) println(i + " fuck  : " + msg);
-}
