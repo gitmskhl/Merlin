@@ -148,12 +148,11 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
             if (!checkInt(arg1) || !checkInt(arg2)) throw new RuntimeError(paren, "Indexes must be numbers.");
             int start = (int)((double)arg1), end = (int)((double)arg2);
             if (start >= length()) throw new RuntimeError(paren, "String index out of range: start index is too big.");
-            if (end >= length()) throw new RuntimeError(paren, "String index out of range: end index is too big.");
+            if (end > length()) throw new RuntimeError(paren, "String index out of range: end index is too big.");
             start = (start + length()) % length();
-            end = (end + length()) % length();
+            if (end != length()) end = (end + length()) % length();
             if (start < 0) throw new RuntimeError(paren, "String index out of range: start index is very negative.");
             if (end < 0) throw new RuntimeError(paren, "String index out of range: end index is very negative.");
-            
             return str.substring(start, end);
         }
 
