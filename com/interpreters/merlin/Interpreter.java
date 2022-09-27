@@ -34,10 +34,7 @@ import com.interpreters.merlin.Stmt.ImportStmt;
 import com.interpreters.merlin.Stmt.RETURNStmt;
 import com.interpreters.merlin.Stmt.VarDeclStmt;
 import com.interpreters.merlin.Stmt.WHILEStmt;
-import com.interpreters.merlin.nativeFunctions.Len;
-import com.interpreters.merlin.nativeFunctions.Printf;
-import com.interpreters.merlin.nativeFunctions.Range;
-import com.interpreters.merlin.nativeFunctions.Int;
+import com.interpreters.merlin.nativeFunctions.*;
 import com.interpreters.merlin.std.map.map;
 import com.interpreters.merlin.std.string.string;
 
@@ -70,6 +67,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         global.define("len", new Len());
         global.define("range", new Range());
         global.define("int", new Int());
+        global.define("input", new Input());
+        global.define("filter", new Filter());
     }
 
     public void addDistances(Map<Expr, Integer> anotherDistances) {

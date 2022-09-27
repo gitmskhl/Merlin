@@ -1,13 +1,11 @@
 
-
 from std import string;
 
 
-var str = string.string("Hello, world!");
+def sqr(x) {
+    return x * x;
+}
 
-len(str);
+var arr = range(1, 10);
 
-
-println(str.getAt(0) == "H");
-
-
+println(filter(sqr, arr));

@@ -18,7 +18,13 @@ public class Int implements MerlinCallable {
     public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
         Object obj = arguments.get(0);
         if (obj instanceof Double) return Math.floor(((double) obj));
-        
+        if (obj instanceof String) {
+            try {
+                return Math.floor(Double.parseDouble((String)obj));
+            }
+            catch(NumberFormatException exception) {}
+        }
+
         throw new RuntimeError(paren, "Native function 'int': Can't convert argument to int.");
     }
 
