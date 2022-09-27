@@ -32,8 +32,7 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
 
     @Override
     public String toString() {
-        System.out.println("this one");
-        return "toString() " + str;
+        return str;
     }
 
     @Override
@@ -64,6 +63,7 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
         set("length", new length());
         set("getAt", new getAt());
         set("substring", new substring());
+        set("reverse", new reverse());
     }
 
     class length implements MerlinCallable {
@@ -160,6 +160,20 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
             double n = (double) obj;
             if (n % 1 != 0) return false;
             return true;
+        }
+
+    }
+
+    class reverse implements MerlinCallable {
+
+        @Override
+        public int arity() {
+            return 0;
+        }
+
+        @Override
+        public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+            return new StringBuilder(str).reverse().toString();
         }
 
     }

@@ -1,15 +1,13 @@
 
-// [l, r)
-def bin_search(arr, key, l, r) {
-    while (r - l > 1) {
-        var mid = int((r + l) / 2);
-        if (arr[mid] > key) r = mid;
-        else l = mid;
-    }
 
-    return l;
-}
+from std import string;
 
-var n = 10000;
 
-println(bin_search(range(n), 7, 0, n));
+var str = string.string("Hello, world!");
+
+len(str);
+
+
+println(str.getAt(0) == "H");
+
+
