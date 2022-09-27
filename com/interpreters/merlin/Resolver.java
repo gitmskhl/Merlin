@@ -143,6 +143,8 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         scope.defineNative("len");
         scope.defineNative("range");
         scope.defineNative("int");
+        scope.defineNative("input");
+        scope.defineNative("filter");
     }
 
     private void resolve(List<Stmt> statements) {

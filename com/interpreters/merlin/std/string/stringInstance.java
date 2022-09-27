@@ -1,6 +1,7 @@
 package com.interpreters.merlin.std.string;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -64,6 +65,7 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
         set("getAt", new getAt());
         set("substring", new substring());
         set("reverse", new reverse());
+        set("split", new split());
     }
 
     class length implements MerlinCallable {
@@ -110,7 +112,7 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
             if (index >= length()) throw new RuntimeError(paren, "String index out of range: index is too big.");
             index = (index + length()) % length();
             if (index < 0) throw new RuntimeError(paren, "String index out of range: index is very negative.");
-            return str.charAt(index);
+            return str.charAt(index) + "";
         }
 
         private Object getList(MerlinListInstance indexes) {
@@ -174,6 +176,28 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
         @Override
         public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
             return new StringBuilder(str).reverse().toString();
+        }
+
+    }
+
+    class split implements MerlinCallable {
+
+        @Override
+        public int arity() {
+            return -1;
+        }
+
+        @Override
+        public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+            String regex = " ";
+            if (arguments.size() == 1) {
+                Object obj = arguments.get(0);
+                if (!(obj instanceof String)) 
+                    throw new RuntimeError(paren, "Argument regex must be string.");
+                
+                regex = (String) obj;
+            }
+            return new MerlinListInstance(new ArrayList<>(Arrays.asList(str.split(regex))));
         }
 
     }
