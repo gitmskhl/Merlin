@@ -38,6 +38,7 @@ public class Scanner {
         keywords.put("import", IMPORT);
         keywords.put("as", AS);
         keywords.put("in", IN);
+        keywords.put("from", FROM);
     }
 
 

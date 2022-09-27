@@ -40,7 +40,8 @@ public class Parser {
     private Stmt declaration() {
         if (match(VAR)) return varDeclarationStatement();
         if (match(CLASS)) return classDeclarationStatement();
-        if (match(IMPORT)) return importStatement();
+        if (match(FROM)) return fromStatement();
+        if (match(IMPORT)) return importStatement(null, null);
         if (check(DEF) && checkNext(IDENTIFIER)) {
             advance();
             return funDeclarationStatement("function");
@@ -70,7 +71,17 @@ public class Parser {
         return new Stmt.ForEachStmt(iter, in, iterable, body);
     }
 
-    private Stmt importStatement() {
+    private Stmt fromStatement() {
+        Token from = previous();
+        List<String> dirs = new ArrayList<>();
+        do {
+            dirs.add(consume(IDENTIFIER, "Expect a directory name.").lexeme);
+        } while(match(DOT));
+        consume(IMPORT, "Expect 'import' after 'from'");
+        return importStatement(from, dirs);
+    }
+
+    private Stmt importStatement(Token from, List<String> dirs) {
         Token keyword = previous();
         Token libname = consume(IDENTIFIER, "Expect module name.");
         Token alias = libname;
@@ -78,7 +89,7 @@ public class Parser {
             alias = consume(IDENTIFIER, "Expect alias.");
         }
         consume(SEMICOLON, "Expect ';' after module name.");
-        return new Stmt.ImportStmt(keyword, libname, alias);
+        return new Stmt.ImportStmt(from, dirs, keyword, libname, alias);
     }
 
     private Stmt classDeclarationStatement() {
