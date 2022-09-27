@@ -1,11 +1,11 @@
 
 
-var arr = range(10, -1, -1);
 
-println(arr);
+from merlinSource.test import lib as lib1;
 
-import b;
+from merlinSource import lib as lib2;
 
-b.sort(arr);
 
-println(arr);
+lib1.libFunction("hi", 3);
+lib2.libFunction("hello", 2)
+;println("it works");

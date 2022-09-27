@@ -54,6 +54,8 @@ public class MerlinListInstance extends MerlinInstance implements MerlinIterable
         current = 0;
     }
 
+    public List<Object> getList() {return list;}
+
     @Override
     public String toString() {
         String result = "[";
@@ -95,7 +97,7 @@ public class MerlinListInstance extends MerlinInstance implements MerlinIterable
             if (index instanceof Double) return getDouble((double) index);
             if (index instanceof MerlinListInstance) return getList((MerlinListInstance) index);
 
-            throw new RuntimeError(bracket, "Index must be an integer.");
+            throw new RuntimeError(bracket, "Index must be an integer or List.");
         }
 
         private Object getDouble(double n) {

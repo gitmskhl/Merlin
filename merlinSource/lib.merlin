@@ -1,0 +1,7 @@
+
+def libFunction(msg, n) {
+    println("Lib function works");
+    for i in range(n) println(i + ": " + msg);
+}
+
+println("lib.merlin");

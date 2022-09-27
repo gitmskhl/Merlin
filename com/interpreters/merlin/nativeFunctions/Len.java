@@ -21,7 +21,7 @@ public class Len implements MerlinCallable {
         Object obj = arguments.get(0);
         if (obj instanceof MerlinLenable) return ((MerlinLenable) obj).size() * 1.0;
         
-        throw new RuntimeError(paren,"object type has not len()");
+        throw new RuntimeError(paren,"object type has no len()");
     }
     
 }

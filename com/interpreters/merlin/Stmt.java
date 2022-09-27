@@ -190,7 +190,9 @@ public abstract class Stmt {
 
 
 	public static class ImportStmt extends Stmt{
-		public ImportStmt(Token keyword, Token libname, Token alias) {
+		public ImportStmt(Token from, List<String> dirs, Token keyword, Token libname, Token alias) {
+			this.from = from;
+			this.dirs = dirs;
 			this.keyword = keyword;
 			this.libname = libname;
 			this.alias = alias;
@@ -200,7 +202,9 @@ public abstract class Stmt {
 		public <R> R accept(Visitor<R> visitor) {
 			return visitor.visitImportStmt(this);
 		}
-		public final Token keyword;
+		public final Token from;
+		public final  List<String> dirs;
+		public final  Token keyword;
 		public final  Token libname;
 		public final  Token alias;
 	}

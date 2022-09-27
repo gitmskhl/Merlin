@@ -37,6 +37,7 @@ import com.interpreters.merlin.Stmt.WHILEStmt;
 import com.interpreters.merlin.nativeFunctions.Len;
 import com.interpreters.merlin.nativeFunctions.Printf;
 import com.interpreters.merlin.nativeFunctions.Range;
+import com.interpreters.merlin.std.string.string;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -502,12 +503,38 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitImportStmt(ImportStmt stmt) {
-        
-        if (stmt.libname.lexeme.equals(module)) return null;
+        boolean isSTD = false;
+        String moduleName = stmt.libname.lexeme;
+        String aliasName = stmt.alias.lexeme;
+        if (stmt.from != null) {
+            if (stmt.dirs.size() == 1 && stmt.dirs.get(0).equals("std")) isSTD = true;
+            moduleName = String.join("/", stmt.dirs) + "/" + moduleName;
+        }
 
-        String fileName = stmt.libname.lexeme + ".merlin";
+        if (moduleName.equals(module)) return null;
 
-        if (!libs.containsKey(stmt.libname.lexeme)) {
+        String fileName = moduleName + ".merlin";
+
+        if (isSTD) {
+            Environment libEnvironment = new Environment(null);
+            String objectName = "";
+            Object object = null;
+
+            switch (stmt.libname.lexeme) {
+                case "string":
+                    objectName = "string";
+                    object = new string();
+                    break;
+                default:
+                    throw new RuntimeError(stmt.libname, 
+                        "Undefined library '" + stmt.libname.lexeme + "' in std.");
+            }
+
+            libEnvironment.define(objectName, object);
+            MerlinLib lib = new MerlinLib(moduleName, aliasName, libEnvironment);
+            libs.put(lib.name, lib);
+        }
+        else if (!libs.containsKey(moduleName)) {
             String source;
             try {
                 source = Merlin.getSource(fileName);
@@ -515,14 +542,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             catch (IOException exception) {
                 throw new RuntimeError(stmt.keyword, "No such file '" + fileName + "'.");
             }
-            Interpreter newInterpreter = new Interpreter(stmt.libname.lexeme, libs, false);
+            Interpreter newInterpreter = new Interpreter(moduleName, libs, false);
             Environment libEnvironment =  Merlin.run(newInterpreter, source, fileName);
             newInterpreter.addDistances(distances);
-            MerlinLib lib = new MerlinLib(stmt.libname.lexeme, stmt.alias.lexeme, libEnvironment);
+            MerlinLib lib = new MerlinLib(moduleName, aliasName, libEnvironment);
             libs.put(lib.name, lib);
         }
 
-        MerlinLib lib = libs.get(stmt.libname.lexeme);
+        MerlinLib lib = libs.get(moduleName);
         environment.define(lib.alias, lib);
 
         return null;
