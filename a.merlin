@@ -1,4 +1,6 @@
 
-
-
 from merlinSource import Calc;
+
+var source = input();
+
+println(Calc.Calc().calc(source));
