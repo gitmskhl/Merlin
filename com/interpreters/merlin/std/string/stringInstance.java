@@ -38,7 +38,7 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
 
     @Override
     public Object next() {
-        return str.charAt(current++);
+        return str.charAt(current++) + "";
     }
 
 
@@ -153,7 +153,7 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
             if (end != length()) end = (end + length()) % length();
             if (start < 0) throw new RuntimeError(paren, "String index out of range: start index is very negative.");
             if (end < 0) throw new RuntimeError(paren, "String index out of range: end index is very negative.");
-            return str.substring(start, end);
+            return new stringInstance(str.substring(start, end));
         }
 
         private boolean checkInt(Object obj) {
@@ -174,7 +174,7 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
 
         @Override
         public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
-            return new StringBuilder(str).reverse().toString();
+            return new stringInstance(new StringBuilder(str).reverse().toString());
         }
 
     }

@@ -1,6 +1,9 @@
 
-from merlinSource import Calc;
 
-var source = input();
+from std import os as system;
 
-println(Calc.Calc().calc(source));
+var os = system.os();
+
+println(os.name());
+
+os.clear();

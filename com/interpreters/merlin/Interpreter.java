@@ -37,6 +37,7 @@ import com.interpreters.merlin.Stmt.VarDeclStmt;
 import com.interpreters.merlin.Stmt.WHILEStmt;
 import com.interpreters.merlin.nativeFunctions.*;
 import com.interpreters.merlin.std.map.map;
+import com.interpreters.merlin.std.os.os;
 import com.interpreters.merlin.std.string.string;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
@@ -71,6 +72,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         global.define("input", new Input());
         global.define("filter", new Filter());
         global.define("double", new MDouble());
+        global.define("min", new Min());
+        global.define("max", new Max());
     }
 
     public void addDistances(Map<Expr, Integer> anotherDistances) {
@@ -338,7 +341,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return left.equals(right);
     }
 
-    private boolean less(Object left, Object right, Token operation) {
+    public static boolean less(Object left, Object right, Token operation) {
         if ((left instanceof Double) && (right instanceof Double)) return (double) left < (double) right;
         if ((left instanceof String) && (right instanceof String))
             return ((String) left).compareTo((String) right) < 0;
@@ -535,6 +538,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 case "map":
                     objectName = "map";
                     object = new map();
+                    break;
+                case "os":
+                    objectName = "os";
+                    object = new os();
                     break;
                 default:
                     throw new RuntimeError(stmt.libname, 
