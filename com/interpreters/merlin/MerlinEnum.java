@@ -12,5 +12,10 @@ public class MerlinEnum extends MerlinInstance {
             set(const_.lexeme, i++);
         }
     }
+
+    @Override
+    public String toString() {
+        return "<MerlinEnum class>";
+    }
     
 }
