@@ -1,0 +1,102 @@
+
+
+from merlinSource import TokenType as tt;
+from merlinSource import Expr;
+
+class Parser {
+
+    init(tokens) {
+        this.tokens = tokens;
+        this.current = 0;
+    }
+
+    parse() {
+        return this.expression();
+    }
+
+    expression() {
+        return this.term();
+    }
+
+    term() {
+        var expr = this.factor();
+        while (this.match(tt.TokenType.PLUS, tt.TokenType.MINUS)) {
+            var operator = this.previous();
+            var right = this.factor();
+            expr = Expr.Binary(expr, operator, right);
+        }
+        return expr;
+    }
+
+    factor() {
+        var expr = this.unary();
+        while (this.match(tt.TokenType.SLASH, tt.TokenType.STAR)) {
+            var operator = this.previous();
+            var right = this.unary();
+            expr = Expr.Binary(expr, operator, right);
+        }
+        return expr;
+    }
+
+    unary() {
+        if (this.matchOne(tt.TokenType.MINUS)) {
+            var operator = this.previous();
+            var right = this.unary();
+            return Expr.Unary(operator, right);
+        }
+
+        return this.primary();
+    }
+
+    primary() {
+        if (this.matchOne(tt.TokenType.NUMBER)) return Expr.Literal(double(this.previous().lexeme));
+        if (this.matchOne(tt.TokenType.LEFT_PAREN)) {
+            var expr = this.expression();
+            this.consume(tt.TokenType.RIGHT_PAREN, "Expect } after expression");
+            return Expr.Group(expr);
+        }
+        println("ERROR. UNDEFINED PRIMARY EXPRESSION");
+    }
+
+    consume(type, msg) {
+        if (!this.matchOne(type)) {
+            println(msg);
+        }
+    }
+
+    matchOne(type) {
+        if (this.peek().type  == type) {
+            this.advance();
+            return true;
+        }
+        return false;
+    }
+
+    match(type1, type2) {
+        var p = this.peek();
+        if (p.type == type1 or p.type == type2) {
+            this.advance();
+            return true;
+        }
+        return false;
+    }
+
+    advance() {
+        if (this.isAtEnd()) return this.peek();
+        this.current += 1;
+        return this.previous();
+    }
+
+    previous() {
+        return this.tokens[this.current - 1];
+    }
+
+    peek() {
+        return this.tokens[this.current];
+    }
+
+    isAtEnd() {
+        return this.tokens[this.current].type == tt.TokenType.EOF;
+    }
+
+}

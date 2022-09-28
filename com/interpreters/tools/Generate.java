@@ -56,7 +56,8 @@ public class Generate {
             "VarDecl    : List<Token> names, List<Expr> initializers",
             "FunDecl    : Token name, Expr.FunctionExpr description",
             "ClassDecl  : Token name, Expr.VariableExpr superclass, List<FunDeclStmt> methods",
-            "Import     : Token from, List<String> dirs, Token keyword, Token libname, Token alias"
+            "Import     : Token from, List<String> dirs, Token keyword, Token libname, Token alias",
+            "Enum       : Token name, List<Token> consts"
         ));
     }
 

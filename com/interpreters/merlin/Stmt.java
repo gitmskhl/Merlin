@@ -18,6 +18,7 @@ public abstract class Stmt {
 		R visitFunDeclStmt(FunDeclStmt stmt);
 		R visitClassDeclStmt(ClassDeclStmt stmt);
 		R visitImportStmt(ImportStmt stmt);
+		R visitEnumStmt(EnumStmt stmt);
 	}
 
 
@@ -207,6 +208,22 @@ public abstract class Stmt {
 		public final  Token keyword;
 		public final  Token libname;
 		public final  Token alias;
+	}
+
+
+
+	public static class EnumStmt extends Stmt{
+		public EnumStmt(Token name, List<Token> consts) {
+			this.name = name;
+			this.consts = consts;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitEnumStmt(this);
+		}
+		public final Token name;
+		public final  List<Token> consts;
 	}
 
 
