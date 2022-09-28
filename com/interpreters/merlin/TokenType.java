@@ -17,7 +17,7 @@ public enum TokenType {
 
     // keywords
     TRUE, FALSE, NIL, FOR, WHILE, IF, ELSE, DEF, CLASS, AND, OR,
-    RETURN, THIS, SUPER, VAR, IMPORT, AS, IN, FROM,
+    RETURN, THIS, SUPER, VAR, IMPORT, AS, IN, FROM, ENUM,
 
     /// END OF FILE
     EOF

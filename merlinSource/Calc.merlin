@@ -1,4 +1,11 @@
 
+from merlinSource import Scanner;
+from merlinSource import Parser;
+from merlinSource import Interpreter;
 
+var source = input();
+var tokens = Scanner.Scanner(source).scan();
 
+var expr = Parser.Parser(tokens).parse();
 
+println(Interpreter.Interpreter().interpret(expr));

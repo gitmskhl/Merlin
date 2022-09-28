@@ -39,6 +39,7 @@ public class Scanner {
         keywords.put("as", AS);
         keywords.put("in", IN);
         keywords.put("from", FROM);
+        keywords.put("enum", ENUM);
     }
 
 

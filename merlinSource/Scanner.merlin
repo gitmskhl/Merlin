@@ -1,0 +1,83 @@
+
+from std import string;
+
+from merlinSource import Token;
+from merlinSource  import TokenType as tt;
+
+class Scanner {
+
+    init(str) {
+        this.str = string.string(str);
+        this.current = this.start = 0;
+        this.tokens = [];
+    }
+
+    scan() {
+        while (!this.isAtEnd()) {
+            this.start = this.current;
+            var c = this.advance();
+            this.scanToken(c);
+        }
+
+        this.tokens.add(Token.Token(tt.TokenType.EOF, "", nil));
+        return this.tokens;
+    }
+
+    scanToken(c) {
+        if (c == "+") this.addToken(tt.TokenType.PLUS);
+        else if (c == "-") this.addToken(tt.TokenType.MINUS);
+        else if (c == "*") this.addToken(tt.TokenType.STAR);
+        else if (c == "/") this.addToken(tt.TokenType.SLASH);
+        else if (c == "(") this.addToken(tt.TokenType.LEFT_PAREN);
+        else if (c == ")") this.addToken(tt.TokenType.RIGHT_PAREN);
+        else if (this.isDigit(c)) {
+            while (!this.isAtEnd() and this.isDigit(this.peek())) this.advance();
+            if (this.peek() == ".") {
+                this.advance();
+                while (!this.isAtEnd() and this.isDigit(this.peek())) this.advance();
+            }
+
+            var lexeme = this.str.substring(this.start, this.current);
+            var literal = double(lexeme);
+            this.tokens.add(Token.Token(tt.TokenType.NUMBER, lexeme, literal));
+        }
+    }
+
+    addToken(type) {
+        var lexeme = this.str.substring(this.start, this.current), literal = nil;
+        this.tokens.add(Token.Token(type, lexeme, literal));
+    }
+
+    isDigit(c) {
+        return c >= "0" and c <= "9";
+    }
+
+    isAtEnd() {
+        return this.current >= len(this.str);
+    }
+
+    peek() {
+        if (this.isAtEnd()) return "\0";
+        return this.str.getAt(this.current);
+    }
+
+    advance() {
+        if (this.isAtEnd()) return this.previous();
+        var res = this.peek();
+        this.current += 1;
+        return res;
+    }
+
+    previous() {
+        return this.str.getAt(this.current - 1);
+    }
+
+    match(expected) {
+        if (this.peek() == expected) {
+            this.current += 1;
+            return true;
+        }
+        return false;
+    }
+
+}
