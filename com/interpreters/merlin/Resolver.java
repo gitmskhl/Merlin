@@ -147,6 +147,8 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         scope.defineNative("input");
         scope.defineNative("filter");
         scope.defineNative("double");
+        scope.defineNative("min");
+        scope.defineNative("max");
     }
 
     private void resolve(List<Stmt> statements) {
