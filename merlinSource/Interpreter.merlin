@@ -1,0 +1,41 @@
+
+from merlinSource import TokenType as tt;
+
+
+class Interpreter {
+    
+    interpret(expr) {
+        return expr.accept(this);
+    }
+
+    visitLiteral(expr) {
+        return expr.value;
+    }
+
+    visitUnary(expr) {
+        return -(this.interpret(expr.expr));
+    }
+
+    visitBinary(expr) {
+        if (expr.operator.type == tt.TokenType.PLUS) {
+            return this.interpret(expr.left) + this.interpret(expr.right);
+        }
+        else if (expr.operator.type == tt.TokenType.MINUS) {
+            return this.interpret(expr.left) - this.interpret(expr.right);
+        }
+        else if (expr.operator.type == tt.TokenType.STAR) {
+            return this.interpret(expr.left) * this.interpret(expr.right);
+        }
+        else if (expr.operator.type == tt.TokenType.SLASH) {
+            return this.interpret(expr.left) / this.interpret(expr.right);
+        }
+    }
+
+    visitGroup(expr) {
+        return this.interpret(expr.expr);
+    }
+
+}
+
+
+

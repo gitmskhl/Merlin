@@ -26,6 +26,7 @@ import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
 import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ClassDeclStmt;
+import com.interpreters.merlin.Stmt.EnumStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
 import com.interpreters.merlin.Stmt.ForEachStmt;
@@ -145,6 +146,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         scope.defineNative("int");
         scope.defineNative("input");
         scope.defineNative("filter");
+        scope.defineNative("double");
     }
 
     private void resolve(List<Stmt> statements) {
@@ -475,6 +477,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         resolve(stmt.iterable);
         resolve(stmt.body);
         endScope();
+        return null;
+    }
+
+    @Override
+    public Void visitEnumStmt(EnumStmt stmt) {
+        declare(stmt.name);
+        define(stmt.name.lexeme);
+        initialize(stmt.name.lexeme);
         return null;
     }
 

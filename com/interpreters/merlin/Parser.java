@@ -42,6 +42,7 @@ public class Parser {
         if (match(CLASS)) return classDeclarationStatement();
         if (match(FROM)) return fromStatement();
         if (match(IMPORT)) return importStatement(null, null);
+        if (match(ENUM)) return enumStatement();
         if (check(DEF) && checkNext(IDENTIFIER)) {
             advance();
             return funDeclarationStatement("function");
@@ -59,6 +60,19 @@ public class Parser {
         if (match(FOR)) return forStatement();
 
         return expressionStatement();
+    }
+
+    private Stmt enumStatement() {
+        Token name = consume(IDENTIFIER, "Expect enum name.");
+        consume(LEFT_BRACE, "Expect '{' after enum name.");
+        List<Token> consts = new ArrayList<>();
+        if (!check(RIGHT_BRACE)) {
+            do {
+                consts.add(consume(IDENTIFIER, "Expect enum const."));
+            }while(match(COMMA));
+        }
+        consume(RIGHT_BRACE, "Expect '}' after enum body.");
+        return new Stmt.EnumStmt(name, consts);
     }
 
     private Stmt forEachStatement() {

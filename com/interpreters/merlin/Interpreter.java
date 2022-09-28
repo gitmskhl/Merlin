@@ -25,6 +25,7 @@ import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
 import com.interpreters.merlin.Stmt.BlockStmt;
 import com.interpreters.merlin.Stmt.ClassDeclStmt;
+import com.interpreters.merlin.Stmt.EnumStmt;
 import com.interpreters.merlin.Stmt.ExpressionStmt;
 import com.interpreters.merlin.Stmt.FORStmt;
 import com.interpreters.merlin.Stmt.ForEachStmt;
@@ -69,6 +70,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         global.define("int", new Int());
         global.define("input", new Input());
         global.define("filter", new Filter());
+        global.define("double", new MDouble());
     }
 
     public void addDistances(Map<Expr, Integer> anotherDistances) {
@@ -589,6 +591,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         finally {
             environment = tmp;
         }
+    }
+
+    @Override
+    public Void visitEnumStmt(EnumStmt stmt) {
+        MerlinEnum merlinEnum = new MerlinEnum(stmt.consts);
+        environment.define(stmt.name.lexeme, merlinEnum);
+        return null;
     }
 
 }

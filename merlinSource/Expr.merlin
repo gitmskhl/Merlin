@@ -1,0 +1,47 @@
+
+
+class Literal {
+    init(value) {
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitLiteral(this);
+    }
+}
+
+
+class Unary {
+    init(operator, expr) {
+        this.operator = operator;
+        this.expr = expr;
+    }
+
+    accept(visitor) {
+        return visitor.visitUnary(this);
+    }
+}
+
+
+class Binary {
+    init(left, operator, right) {
+        this.left = left;
+        this.operator = operator;
+        this.right = right;
+    }
+
+    accept(visitor) {
+        return visitor.visitBinary(this);
+    }
+}
+
+class Group {
+    init(expr) {
+        this.expr = expr;
+    }
+
+    accept(visitor) {
+        return visitor.visitGroup(this);
+    }
+}
+
