@@ -1,6 +1,7 @@
 
-from merlinSource import Calc;
+// from std import string as str;
 
-var source = input();
 
-println(Calc.Calc().calc(source));
+var arr = filter(def(x){return x * x;}, range(1, 10));
+
+println(arr);
