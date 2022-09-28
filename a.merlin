@@ -1,9 +1,11 @@
 
 
-from std import os as system;
+var a1 = [1, 2, 3],
+    a2 = [4, 5];
 
-var os = system.os();
 
-println(os.name());
+println(a1, "\n", a2);
 
-os.clear();
+println(a1 + a2);
+
+println(a1, "\n", a2);

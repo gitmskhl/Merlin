@@ -39,6 +39,7 @@ public class MerlinListInstance extends MerlinInstance implements MerlinIterable
         ((MerlinCallable)get(setToken)).call(null, Arrays.asList(index, value), bracket);
     }
 
+
     @Override
     public Object next() {
         return list.get(current++);
