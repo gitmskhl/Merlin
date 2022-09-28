@@ -37,6 +37,7 @@ import com.interpreters.merlin.Stmt.VarDeclStmt;
 import com.interpreters.merlin.Stmt.WHILEStmt;
 import com.interpreters.merlin.nativeFunctions.*;
 import com.interpreters.merlin.std.map.map;
+import com.interpreters.merlin.std.os.os;
 import com.interpreters.merlin.std.string.string;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
@@ -537,6 +538,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 case "map":
                     objectName = "map";
                     object = new map();
+                    break;
+                case "os":
+                    objectName = "os";
+                    object = new os();
                     break;
                 default:
                     throw new RuntimeError(stmt.libname, 

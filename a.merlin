@@ -1,7 +1,9 @@
 
-// from std import string as str;
 
+from std import os as system;
 
-var arr = filter(def(x){return x * x;}, range(1, 10));
+var os = system.os();
 
-println(arr);
+println(os.name());
+
+os.clear();
