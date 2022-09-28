@@ -375,7 +375,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if ((left instanceof Double) && (right instanceof Double)) {
             return (double) left + (double) right;
         }
-
+        if (left instanceof MerlinListInstance && right instanceof MerlinListInstance) {
+            List<Object> newList = new ArrayList<>();
+            newList.addAll(((MerlinListInstance)left).getList());
+            newList.addAll(((MerlinListInstance)right).getList());
+            return new MerlinListInstance(newList);
+        }
         if (left instanceof String) {
             return (String) left + stringify(right);
         }
