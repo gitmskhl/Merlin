@@ -77,6 +77,7 @@ public class MerlinListInstance extends MerlinInstance implements MerlinIterable
     }
 
     private int correctIndex(int index) {
+        if (index >= 0 || list.size() == 0) return index;
         return (index + list.size()) % list.size();
     }
 
@@ -108,7 +109,7 @@ public class MerlinListInstance extends MerlinInstance implements MerlinIterable
         private Object getDouble(double n) {
             if (n % 1 != 0) throw new RuntimeError(bracket, "Index must be an integer.");
             int index = (int)n;
-            return getIndex(correctIndex(index));
+            return getIndex(index);
         }
     
         private Object getIndex(int index) {
