@@ -66,6 +66,7 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
         set("substring", new substring());
         set("reverse", new reverse());
         set("split", new split());
+        set("_str", str);
     }
 
     class length implements MerlinCallable {
@@ -110,7 +111,7 @@ public class stringInstance extends MerlinInstance implements MerlinIterable, Me
 
         private Object getIndex(int index) {
             if (index >= length()) throw new RuntimeError(paren, "String index out of range: index is too big.");
-            index = (index + length()) % length();
+            if (index < 0 && length() != 0) index = (index + length()) % length();
             if (index < 0) throw new RuntimeError(paren, "String index out of range: index is very negative.");
             return str.charAt(index) + "";
         }

@@ -24,6 +24,7 @@ public abstract class Expr {
 		R visitListExpr(ListExpr expr);
 		R visitListGetExpr(ListGetExpr expr);
 		R visitListSetExpr(ListSetExpr expr);
+		R visitTernaryExpr(TernaryExpr expr);
 	}
 
 
@@ -299,6 +300,24 @@ public abstract class Expr {
 		}
 		public final Expr.ListGetExpr getter;
 		public final  Expr value;
+	}
+
+
+
+	public static class TernaryExpr extends Expr{
+		public TernaryExpr(Expr condition, Expr left, Expr right) {
+			this.condition = condition;
+			this.left = left;
+			this.right = right;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitTernaryExpr(this);
+		}
+		public final Expr condition;
+		public final  Expr left;
+		public final  Expr right;
 	}
 
 
