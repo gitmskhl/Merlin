@@ -1,3 +1,10 @@
 
+from merlinstd import io;
 
-println(filter(def(x){return 4 * x;}, [4, 7, 10, 62]));
+
+
+
+
+
+
+
