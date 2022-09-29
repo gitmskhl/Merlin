@@ -183,6 +183,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Object visitTernaryExpr(Expr.TernaryExpr expr) {
+        Object condition = evaluate(expr.condition);
+        if (isTruthy(condition)) return evaluate(expr.left);
+        return evaluate(expr.right);
+    }
+
+    @Override
     public Object visitLogicExpr(LogicExpr expr) {
         Object left = evaluate(expr.left);
         if (expr.operation.type == TokenType.OR) {

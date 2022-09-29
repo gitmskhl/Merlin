@@ -1,11 +1,11 @@
+from merlinstd import io;
+
+io.clear_console();
+
+var arr = io.input_int_arr();
+
+var a = arr[0], b = arr[1];
 
 
-var a1 = [1, 2, 3],
-    a2 = [4, 5];
+println(a > 5 ? b > 5 ? "aB" : "ab" : b > 5 ? "aB" : "ab");
 
-
-println(a1, "\n", a2);
-
-println(a1 + a2);
-
-println(a1, "\n", a2);

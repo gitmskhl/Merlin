@@ -226,7 +226,7 @@ public class Parser {
     }
 
     private Expr assignment() {
-        Expr expr = or();
+        Expr expr = ternar();
         if (match(EQUAL, PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL, PERCENT_EQUAL)) {
             if (expr instanceof Expr.VariableExpr) {
                 Token operator = previous();
@@ -256,6 +256,19 @@ public class Parser {
             }
 
             throw error("Can't assign a non-variable type value.");
+        }
+
+        return expr;
+    }
+
+    private Expr ternar() {
+        Expr expr = or();
+
+        if (match(QUESTION)) {
+            Expr left = ternar();
+            consume(COLON, "Expect ':' in ternary operator.");
+            Expr right = ternar();
+            return new Expr.TernaryExpr(expr, left, right);
         }
 
         return expr;
