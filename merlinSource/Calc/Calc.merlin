@@ -1,7 +1,7 @@
 
-from merlinSource import Scanner;
-from merlinSource import Parser;
-from merlinSource import Interpreter;
+from merlinSource.Calc import Scanner;
+from merlinSource.Calc import Parser;
+from merlinSource.Calc import Interpreter;
 
 class Calc {
     calc(source) {

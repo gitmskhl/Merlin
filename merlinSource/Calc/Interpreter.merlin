@@ -1,5 +1,5 @@
 
-from merlinSource import TokenType as tt;
+from merlinSource.Calc import TokenType as tt;
 
 
 class Interpreter {

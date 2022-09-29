@@ -1,0 +1,98 @@
+
+from std import os;
+from merlinSource.Snake import Paint;
+
+class coordinate {
+    init(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+enum Direction {
+    U, D, L, R
+}
+
+class Snake {
+
+    init(size) {
+        this.size = size;
+        this.painter = Paint.Paint(size);
+        this.coordinates = [
+            coordinate(5, 0), 
+            coordinate(4, 0), 
+            coordinate(3, 0),
+            coordinate(2, 0),
+            coordinate(1, 0),
+            coordinate(0, 0)
+            ];
+    }
+
+    start(path) {
+        var newCoordinate;
+        while (true) {
+            for dir in path {
+                if (dir == Direction.R) newCoordinate = this.right();
+                else if (dir == Direction.L) newCoordinate = this.left();
+                else if (dir == Direction.U) newCoordinate = this.up();
+                else newCoordinate = this.down();
+                this.update(newCoordinate);
+                this.sleep();
+            }
+        }
+    }
+
+    right() {
+        return coordinate((this.coordinates[0].x + 1) % this.size, this.coordinates[0].y);
+    }
+
+    left() {
+        return coordinate((this.coordinates[0].x - 1 + this.size) % this.size, this.coordinates[0].y);
+    }
+
+    up() {
+        return coordinate(this.coordinates[0].x, (this.coordinates[0].y - 1 + this.size) % this.size);
+    }
+
+    down() {
+        return coordinate(this.coordinates[0].x, (this.coordinates[0].y + 1) % this.size);
+    }
+
+    update(newCoordinate) {
+        this.coordinates = [newCoordinate] + this.coordinates[range(len(this.coordinates) - 1)];
+        this.painter.clear();
+        this.painter.makeMap(this.coordinates);
+        this.painter.show();
+    }
+
+    sleep() {
+        os.os().sleep(400);
+    }
+
+}
+
+var PATH = [
+    Direction.R,
+    Direction.R,
+    Direction.R,
+    Direction.R,
+    Direction.R,
+    Direction.R,
+    Direction.R,
+    Direction.R,
+    Direction.R,
+    Direction.D,
+    Direction.D,
+    Direction.D,
+    Direction.L,
+    Direction.L,
+    Direction.L,
+    Direction.L,
+    Direction.U,
+    Direction.U
+];
+
+Snake(20).start(PATH);
+
+
+

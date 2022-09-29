@@ -1,0 +1,36 @@
+
+from std import os as system;
+
+class Paint {
+
+    init(size) {
+        this.size = size;
+        this.createMap();
+    }
+
+    createMap() {
+        this.map = [["*" for _ in range(this.size)] for _ in range(this.size)];
+    }
+
+    clearMap() {
+        this.createMap();
+    }
+
+    makeMap(coordinates) {
+        this.clearMap();
+        for coordinate in coordinates 
+            this.map[coordinate.y][coordinate.x] = "0";
+    }
+
+    show() {
+        for line in this.map {
+            for c in line print(c, " ");
+            println("");
+        }
+    }
+
+    clear() {
+        system.os().clear();
+    }
+
+}

@@ -1,8 +1,8 @@
 
 from std import string;
 
-from merlinSource import Token;
-from merlinSource  import TokenType as tt;
+from merlinSource.Calc import Token;
+from merlinSource.Calc  import TokenType as tt;
 
 class Scanner {
 
