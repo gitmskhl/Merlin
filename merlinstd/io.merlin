@@ -2,6 +2,11 @@
 from std import string;
 from std import os;
 
+
+def read() {
+    return string.string(input());
+}
+
 def input_int_arr() {
     return filter(int, string.string(input()).split());
 }

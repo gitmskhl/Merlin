@@ -22,6 +22,7 @@ public abstract class Expr {
 		R visitSuperExpr(SuperExpr expr);
 		R visitSuperCallExpr(SuperCallExpr expr);
 		R visitListExpr(ListExpr expr);
+		R visitListComprExpr(ListComprExpr expr);
 		R visitListGetExpr(ListGetExpr expr);
 		R visitListSetExpr(ListSetExpr expr);
 		R visitTernaryExpr(TernaryExpr expr);
@@ -266,6 +267,26 @@ public abstract class Expr {
 		}
 		public final Token bracket;
 		public final  List<Expr> elements;
+	}
+
+
+
+	public static class ListComprExpr extends Expr{
+		public ListComprExpr(Token bracket, Expr expr, Stmt.ForEachStmt forComprehension, Expr filter) {
+			this.bracket = bracket;
+			this.expr = expr;
+			this.forComprehension = forComprehension;
+			this.filter = filter;
+		}
+
+		@Override
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitListComprExpr(this);
+		}
+		public final Token bracket;
+		public final  Expr expr;
+		public final  Stmt.ForEachStmt forComprehension;
+		public final  Expr filter;
 	}
 
 

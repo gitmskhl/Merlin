@@ -40,6 +40,7 @@ public class Generate {
             "Super      : Token keyword, Token property",
             "SuperCall  : Token keyword, List<Expr> arguments",
             "List       : Token bracket, List<Expr> elements",
+            "ListCompr  : Token bracket, Expr expr, Stmt.ForEachStmt forComprehension, Expr filter",
             "ListGet    : Expr object, Token bracket, Expr index",
             "ListSet    : Expr.ListGetExpr getter, Expr value",
             "Ternary    : Expr condition, Expr left, Expr right"

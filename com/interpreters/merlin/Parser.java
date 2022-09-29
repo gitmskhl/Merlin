@@ -419,17 +419,35 @@ public class Parser {
     }
 
 
-    private Expr.ListExpr parseList() {
+    private Expr parseList() {
         Token bracket = previous();
         List<Expr> elements = new ArrayList<>();
         if (!check(RIGHT_BRACKET)) {
-            do {
+            Expr expr = expression();
+            if (match(FOR)) return forComprehension(expr, bracket);
+            elements.add(expr);
+            while(match(COMMA)) {
                 elements.add(expression());
-            } while(match(COMMA));
+            }
         }
 
         consume(RIGHT_BRACKET, "Expect ']' after list elements.");
         return new Expr.ListExpr(bracket, elements);
+    }
+
+    private Expr forComprehension(Expr expr, Token bracket) {
+        Expr var = primary();
+        if (!(var instanceof Expr.VariableExpr)) 
+            throw error(previous(), "Expect iterator variable in list comprehension.");
+        VariableExpr iter = (VariableExpr) var;
+        Token in = consume(IN, "Expect 'in' after iterator variable in list comprehension.");
+        Expr iterable = expression();
+        Expr filter = null;
+        if (match(IF)) filter = expression();
+        if (filter == null) filter = new Expr.LiteralExpr(true);
+        consume(RIGHT_BRACKET, "Expect ']' after list elements in list comprehension.");
+
+        return new Expr.ListComprExpr(bracket, expr, new Stmt.ForEachStmt(iter, in, iterable, null), filter);
     }
 
     private Expr.FunctionExpr parseAnonymusFunction() {

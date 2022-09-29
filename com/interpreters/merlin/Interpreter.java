@@ -12,6 +12,7 @@ import com.interpreters.merlin.Expr.CallExpr;
 import com.interpreters.merlin.Expr.FunctionExpr;
 import com.interpreters.merlin.Expr.GetExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
+import com.interpreters.merlin.Expr.ListComprExpr;
 import com.interpreters.merlin.Expr.ListExpr;
 import com.interpreters.merlin.Expr.ListGetExpr;
 import com.interpreters.merlin.Expr.ListSetExpr;
@@ -277,6 +278,35 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         return new MerlinListInstance(elements);
     }   
+
+    @Override
+    public Object visitListComprExpr(ListComprExpr expr) {
+
+        Environment newEnv = new Environment(environment);
+        Environment tmp = environment;
+
+        try {
+            environment = newEnv;
+            Object iter = evaluate(expr.forComprehension.iterable);
+            if (!(iter instanceof MerlinIterable)) {
+                throw new RuntimeError(expr.forComprehension.in, "Expression after 'in' must be iterable in list comprehension.");
+            }
+
+            MerlinIterable iterable = (MerlinIterable) iter;
+
+            List<Object> lst = new ArrayList<>();
+            for (; !iterable.isAtEnd(); ) {
+                environment.assign(expr.forComprehension.iter.name.lexeme, iterable.next(), distances.get(expr.forComprehension.iter));
+                if (isTruthy(evaluate(expr.filter))) lst.add(evaluate(expr.expr));
+            }
+
+            iterable.reset();
+            return new MerlinListInstance(lst);
+        }
+        finally {
+            environment = tmp;
+        }
+    }
 
     @Override
     public Object visitListGetExpr(ListGetExpr expr) {
