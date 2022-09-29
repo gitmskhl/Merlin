@@ -1,3 +1,3 @@
 
 
-println(filter(def(x){return 4 * x;}, [4, 7, 10, 62]));
+println([i for i in range(10)]);
