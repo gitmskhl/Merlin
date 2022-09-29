@@ -21,6 +21,7 @@ import com.interpreters.merlin.Expr.LogicExpr;
 import com.interpreters.merlin.Expr.SetExpr;
 import com.interpreters.merlin.Expr.SuperCallExpr;
 import com.interpreters.merlin.Expr.SuperExpr;
+import com.interpreters.merlin.Expr.TernaryExpr;
 import com.interpreters.merlin.Expr.ThisExpr;
 import com.interpreters.merlin.Expr.UnaryExpr;
 import com.interpreters.merlin.Expr.VariableExpr;
@@ -278,6 +279,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitBinaryExpr(BinaryExpr expr) {
+        resolve(expr.left);
+        resolve(expr.right);
+        return null;
+    }
+
+    @Override
+    public Void visitTernaryExpr(TernaryExpr expr) {
+        resolve(expr.condition);
         resolve(expr.left);
         resolve(expr.right);
         return null;

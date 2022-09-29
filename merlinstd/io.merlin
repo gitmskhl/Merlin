@@ -1,0 +1,15 @@
+
+from std import string;
+from std import os;
+
+def input_int_arr() {
+    return filter(int, string.string(input()).split());
+}
+
+def input_double_arr() {
+    return filter(double, string.string(input()).split());
+}
+
+def clear_console() {
+    os.os().clear();
+}
