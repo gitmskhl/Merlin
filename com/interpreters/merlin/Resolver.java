@@ -13,6 +13,7 @@ import com.interpreters.merlin.Expr.CallExpr;
 import com.interpreters.merlin.Expr.FunctionExpr;
 import com.interpreters.merlin.Expr.GetExpr;
 import com.interpreters.merlin.Expr.GroupingExpr;
+import com.interpreters.merlin.Expr.ListComprExpr;
 import com.interpreters.merlin.Expr.ListExpr;
 import com.interpreters.merlin.Expr.ListGetExpr;
 import com.interpreters.merlin.Expr.ListSetExpr;
@@ -335,6 +336,19 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     @Override
     public Void visitListExpr(ListExpr expr) {
         for (Expr element : expr.elements) resolve(element);
+        return null;
+    }
+
+    @Override
+    public Void visitListComprExpr(ListComprExpr expr) {
+        beginScope();
+        defineNative(expr.forComprehension.iter.name.lexeme);
+        resolve(expr.forComprehension.iter);
+        resolve(expr.forComprehension.iterable);
+        resolve(expr.filter);
+        resolve(expr.expr);
+        endScope();
+
         return null;
     }
 

@@ -20,6 +20,7 @@ public class Len implements MerlinCallable {
     public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
         Object obj = arguments.get(0);
         if (obj instanceof MerlinLenable) return ((MerlinLenable) obj).size() * 1.0;
+        if (obj instanceof String) return ((String) obj).length() * 1.0;
         
         throw new RuntimeError(paren,"object type has no len()");
     }
