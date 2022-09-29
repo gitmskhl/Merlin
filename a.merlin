@@ -3,7 +3,9 @@ from merlinstd import io;
 
 
 
+var arr = [word for word in io.read().split() if len(word) < 5];
 
+println(arr);
 
 
 
