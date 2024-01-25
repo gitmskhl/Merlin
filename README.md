@@ -66,7 +66,7 @@ def eventHandler(callback) {
 }
 
 
-eventHandler(def () {//some actions});
+eventHandler(def () {/* some actions */ });
 ```
 
 
