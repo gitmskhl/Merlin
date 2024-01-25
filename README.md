@@ -134,9 +134,32 @@ println(a);
 ```
 Output:
 ```
-6
-17
 24
+17
+6
+```
+
+The language supports the ability to create Python-style lists
+
+```
+from string import string;
+from std import os;
+
+var lst = [word for word in string(input()).split() if len(word) > 5]; 
+```
+
+Advanced indexing using lists is also supported
+
+```
+var lst = range(10, 20);
+
+print(lst[range(0, 10, 2)]);
+println(lst[[1, 3]])
+```
+Output:
+```
+[10, 12, 14, 16, 18]
+[11, 13]
 ```
 
 ### Resolver
