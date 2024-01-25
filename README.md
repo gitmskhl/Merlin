@@ -75,12 +75,12 @@ The language supports object-oriented programming with classes, inheritance and 
 ```
 class MyFirstClass {
     /// this is a constructor of the Class
-    def init(name) {
+    init(name) {
         this.name = name;
     }
 
 
-    def getName() {
+    getName() {
         return this.name;
     }
 }
@@ -88,12 +88,12 @@ class MyFirstClass {
 
 class MySecondClass : MyFirstClass {
 
-    def init (name, age) {
+    init (name, age) {
         super(name);
         this.age = age;
     }
 
-    def getAge() {
+    getAge() {
         return this.age;
     }
 
